@@ -28,4 +28,4 @@ tbd
 
 ## Credits
 
-Project extend from ![sammylupt's 'wordlet' project](https://github.com/sammylupt/wordlet)
+Project extend from [sammylupt's 'wordlet' project](https://github.com/sammylupt/wordlet)

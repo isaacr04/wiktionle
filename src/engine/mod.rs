@@ -439,6 +439,17 @@ mod tests {
     }
 
     #[test]
+    /// Case should not matter to whether a guess is correct or not
+    fn test_a_correct_guess_with_different_case_wins() {
+        let mut game = Game::new(GameOptions {
+            answer: Some("slump".to_string()),
+            ..Default::default()
+        });
+        let (won_the_game, _) = game.guess("Slump");
+        assert_eq!(won_the_game, GameStatus::Won);
+    }
+
+    #[test]
     fn test_a_guess_cannot_be_less_than_five_characters() {
         let mut game = Game::new(GameOptions {
             answer: Some("slump".to_string()),

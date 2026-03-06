@@ -84,4 +84,13 @@ mod tests {
             }
         }
     }
+
+    #[test]
+    /// Test that build_letter_counts properly counts letters of word
+    fn test_build_letter_counts_no_word() {
+        let word = "";
+        let character_counts = build_letter_counts(&word);
+
+        assert!(character_counts.is_empty());
+    }
 }

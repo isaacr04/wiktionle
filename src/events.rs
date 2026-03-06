@@ -1,3 +1,4 @@
+// # rust-commandline-example
 //    Copyright 2020 Mari Zupan
 
 //    Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,7 +12,6 @@
 //    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
-
 
 // # battleship-rs
 // MIT License
@@ -35,7 +35,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-
 
 use crossterm::event::{self, Event as CEvent, KeyEvent};
 use std::sync::mpsc;

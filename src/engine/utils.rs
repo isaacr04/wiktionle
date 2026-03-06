@@ -80,7 +80,7 @@ mod tests {
 
             match character_counts.get(&character) {
                 Some(count) => assert_eq!(*count, character_count),
-                _ => assert!(false),
+                None => assert!(false),
             }
         }
     }

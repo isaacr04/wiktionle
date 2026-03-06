@@ -178,8 +178,18 @@ mod tests {
         app.on_key(make_key_event(KeyCode::Backspace)); // H
         assert_eq!(app.input, "H");
 
-        app.on_key(make_key_event(KeyCode::Backspace)); //
-        app.on_key(make_key_event(KeyCode::Backspace)); // should still be empty
+        app.on_key(make_key_event(KeyCode::Backspace)); // should be empty
+        assert_eq!(app.input, "");
+    }
+
+    #[test]
+    /// Check that backspace does nothing when input is already empty
+    fn test_on_backspace_no_input() {
+        let mut app = setup_app(None);
+        app.input = "".to_string();
+
+        // with an empty input using backspace should do nothing
+        app.on_key(make_key_event(KeyCode::Backspace));
         assert_eq!(app.input, "");
     }
 
@@ -298,6 +308,28 @@ mod tests {
         // Last word, end the game losing
         app_enter_letters(&mut app, "flail");
         app.on_key(make_key_event(KeyCode::Enter));
-        assert!(app.disclaimer.is_some()); // no disclaimer
+        assert!(app.disclaimer.is_some()); // disclaimer given lost
+        assert_eq!(app.game.game_status(), GameStatus::Lost)
+    }
+
+    #[test]
+    /// test that valid words can be entered after invalid words
+    fn test_app_enter_valid_word_after_clearing_input() {
+        let mut app = setup_app(None);
+
+        app_enter_letters(&mut app, "asdas"); // not a word
+        app.on_key(make_key_event(KeyCode::Enter));
+
+        app.on_key(make_key_event(KeyCode::Backspace));
+        app.on_key(make_key_event(KeyCode::Backspace));
+        app.on_key(make_key_event(KeyCode::Backspace));
+        app.on_key(make_key_event(KeyCode::Backspace));
+        app.on_key(make_key_event(KeyCode::Backspace));
+    
+        app_enter_letters(&mut app, "valid");
+        assert_eq!(app.input, "valid");
+
+        app.on_key(make_key_event(KeyCode::Enter));
+        assert!(app.disclaimer == None); // disclaimer should be cleared
     }
 }

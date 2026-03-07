@@ -29,3 +29,13 @@ tbd
 ## Credits
 
 Project extend from [sammylupt's 'wordlet' project](https://github.com/sammylupt/wordlet)
+
+### Usage of Third Party Materials
+ui.rs includes code from:
+   - [minesweep-rs](https://github.com/cpcloud/minesweep-rs/blob/main/src/ui.rs)
+
+events.rs includes code from 
+   - [battleship-rs](https://github.com/deepu105/battleship-rs/blob/main/src/event.rs)
+   - [rust-commandline-example](https://github.com/zupzup/rust-commandline-example/blob/main/src/main.rs)
+
+Please see licenses in docs/third_party_licenses for each repository. Notices are included in each file.

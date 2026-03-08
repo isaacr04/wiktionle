@@ -86,3 +86,26 @@ impl Events {
         self.rx.recv()
     }
 }
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    fn setup_events() -> Events {
+        // set tick rate to zero in testing we don't want to wait any time
+        let tick_rate = Duration::from_millis(0);
+        Events::new(tick_rate)
+    }
+
+    #[test]
+    /// Test functionality of next event
+    fn test_next_event_no_input() {
+        let events = setup_events();
+
+        match events.next() {
+            Err(_) => assert!(false), // error provided should not occur, just tick
+            _ => assert!(true), // non error response
+        }
+    }
+}

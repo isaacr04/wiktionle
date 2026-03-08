@@ -105,7 +105,7 @@ mod tests {
 
         match events.next() {
             Err(_) => assert!(false), // error provided should not occur, just tick
-            _ => assert!(true), // non error response
+            _ => assert!(true),       // non error response
         }
     }
 }

@@ -6,7 +6,9 @@ A educational Wordle clone that uses Wiktionary's historical "Word of the Day" e
 
 ## Installation
 
-tbd
+```
+cargo install --git https://github.com/isaacr04/wiktionle
+```
 
 ## Features
 

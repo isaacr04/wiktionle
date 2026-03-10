@@ -326,6 +326,7 @@ mod tests {
         app.on_key(make_key_event(KeyCode::Backspace));
         app.on_key(make_key_event(KeyCode::Backspace));
 
+    
         app_enter_letters(&mut app, "valid");
         assert_eq!(app.input, "valid");
 

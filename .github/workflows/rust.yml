@@ -20,8 +20,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Setup Testing Tools
-      run: cargo install cargo-llvm-cov
 
     - name: Build
       run: cargo build --verbose

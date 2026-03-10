@@ -332,4 +332,5 @@ mod tests {
         app.on_key(make_key_event(KeyCode::Enter));
         assert!(app.disclaimer == None); // disclaimer should be cleared
     }
+    
 }

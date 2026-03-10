@@ -19,10 +19,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup Testing Tools
-      run: cargo install cargo-llvm-cov
-
     - name: Build
       run: cargo build --verbose
     - name: Run test and coverage

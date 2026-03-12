@@ -99,6 +99,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "breaks in workflow due to unavailable input reader"]
     /// Test functionality of next event
     fn test_next_event_no_input() {
         let events = setup_events();

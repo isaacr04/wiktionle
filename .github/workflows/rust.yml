@@ -27,3 +27,5 @@ jobs:
       run: cargo build --verbose
     - name: Run test and coverage
       run: cargo llvm-cov --fail-under-lines 80
+    # - name: Run test
+    #   run: cargo test --verbose

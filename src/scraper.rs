@@ -171,7 +171,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("  — Saved final batch of {n} entries.");
     }
 
-    println!("\n✓ Complete. {} entries in '{}'.", manager.count(), args.output);
+    println!("\nComplete. {} entries in '{}'.", manager.count(), args.output);
 
     Ok(())
 }

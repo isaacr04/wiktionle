@@ -3,8 +3,8 @@ name = "wiktionle"
 version = "0.1.0"
 authors = ["Isaac Rodrigez", "Jeffrey Kotz", "Roy Rodriguez"]
 edition = "2024"
-description = "A terminal-based clone of wordle"
-keywords = ["wordlet", "wordle", "word", "game"]
+description = "A terminal-based clone of wordle using Wiktionary's Word of the Day list."
+keywords = ["wiktionle", "wordle", "word", "game"]
 license-file = "LICENSE"
 
 [dependencies]

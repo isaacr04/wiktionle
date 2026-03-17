@@ -28,6 +28,7 @@ impl Default for Theme {
 }
 
 impl Theme {
+    /// Defines the light theme through a list of colors
     pub fn light_theme() -> Self {
         Self {
             border_color: Color::Black,
@@ -48,6 +49,8 @@ impl Theme {
         }
     }
 
+    /// Defines the dark theme for the App.
+    /// Provides additional colors ontop of the light theme.
     pub fn dark_theme() -> Self {
         Theme {
             border_color: Color::White,

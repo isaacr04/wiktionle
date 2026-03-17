@@ -23,7 +23,11 @@ pub struct AppOptions {
     pub game_config: GameOptions,
 }
 
+/// Encapsulates together, the game, the theme, input handling, and primary app logic
 impl App {
+    /// Constructor for an app given a set of arguments
+    /// 
+    /// * `args` - defines theme and game options of game instance used by the app
     pub fn new(args: AppOptions) -> Self {
         App {
             game: Game::new(args.game_config),
@@ -34,6 +38,9 @@ impl App {
         }
     }
 
+    /// Handle key events, determining which action should be taken depending on input
+    /// 
+    /// * `key` - The key event resulting from a user's input
     pub fn on_key(&mut self, key: KeyEvent) -> () {
         if self.game.game_status() != GameStatus::InProgress {
             self.should_quit = true;
@@ -51,22 +58,29 @@ impl App {
         };
     }
 
+    /// On valid word given, clear disclaimer, and input in preparation for next word
     pub fn on_valid_word(&mut self) -> () {
         self.disclaimer = None;
         self.input = String::from("");
     }
 
+    /// On backspace remove last letter from input
     pub fn on_backspace(&mut self) -> () {
         let _ = self.input.pop();
         ()
     }
 
+    /// On letter input it is appended to the current input limited to 5 characters
     pub fn on_letter_entered(&mut self, letter: char) -> () {
         if self.input.chars().count() <= 4 {
             self.input.push(letter);
         }
     }
 
+    /// Handle user input of enter
+    /// * display disclaimer for invalid input, or other messages
+    /// * checks if input was correct or wrong and display correct disclaimer
+    /// * checks if game was lost
     pub fn on_enter_press(&mut self) -> () {
         // clear the disclaimer the first time a word is played
         if self.disclaimer == Some(Disclaimer::WelcomeMessage) {
@@ -107,6 +121,8 @@ mod tests {
 
     /// Setup function preparing a test app
     /// with set settings and no answer
+    /// 
+    /// * `answer` - the word the user will guess
     fn setup_app(answer: Option<String>) -> App {
         let difficulty = GameDifficulty::Easy;
         let theme = Theme::dark_theme();
@@ -121,6 +137,8 @@ mod tests {
     }
 
     /// Helper function to make a quick key event based on keycode
+    /// 
+    /// * `key_code` - Code of the key input recieved by app
     fn make_key_event(key_code: KeyCode) -> KeyEvent {
         let modifiers = KeyModifiers::empty();
         let key_event = KeyEvent::new(key_code, modifiers);
@@ -128,6 +146,9 @@ mod tests {
     }
 
     /// Helper function to enter letters into app using on_key
+    /// 
+    /// * `app` - instance of the app where game is played
+    /// * `word` - string of user inputs processed by app
     fn app_enter_letters(app: &mut App, word: &str) -> () {
         for character in word.chars() {
             app.on_key(make_key_event(KeyCode::Char(character)));

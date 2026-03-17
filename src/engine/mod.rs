@@ -37,6 +37,8 @@ pub enum GameDifficulty {
     Hard,
 }
 
+
+/// Primary Game structure, representing a game of wordle being played
 pub struct Game {
     guesses: Vec<WordGuess>,
     answer: String,
@@ -54,6 +56,7 @@ pub struct WordGuess {
 }
 
 impl WordGuess {
+    /// Convert the Guess from a Vector of Guess Letters to a String representation
     pub fn word(&self) -> String {
         self.letters
             .as_slice()
@@ -62,6 +65,7 @@ impl WordGuess {
             .collect()
     }
 
+    /// Get all individual letters of the word
     pub fn letters(&self) -> &[GuessLetter] {
         self.letters.as_slice()
     }
@@ -86,6 +90,7 @@ pub struct GameOptions {
 }
 
 impl Default for GameOptions {
+    /// Defines default state for game option if no properties are set
     fn default() -> Self {
         GameOptions {
             answer: None,
@@ -95,6 +100,9 @@ impl Default for GameOptions {
 }
 
 impl Game {
+    /// Constructor for a Game instance defining initial state and answer
+    /// 
+    /// * `args` - defines the options used to configure the game when initially created
     pub fn new(args: GameOptions) -> Self {
         Game {
             guesses: Vec::with_capacity(6),
@@ -117,10 +125,12 @@ impl Game {
         }
     }
 
+    /// Obtain the current status of the game, whether it is won, lost, or inprogress
     pub fn game_status(&self) -> GameStatus {
         self.game_status
     }
 
+    /// Obtain the answer of the game, if not possible return an error
     pub fn get_answer(&self) -> Result<String, GameError> {
         if self.game_status == GameStatus::Lost {
             Ok(self.answer.to_string())
@@ -129,22 +139,35 @@ impl Game {
         }
     }
 
+    /// Obtain all guesses currently made
     pub fn guesses(&self) -> &[WordGuess] {
         self.guesses.as_slice()
     }
 
+    /// Determine if word is present in the dictionary
+    /// 
+    /// * `word` - word to find in dictionary
     fn in_dictionary(&self, word: &str) -> bool {
         self.dictionary.get(word).is_some()
     }
 
+    /// get character of answer from a specified index
+    /// 
+    /// * `index` - index of the answer to pick a letter from
     fn answer_char_at_index(&self, index: usize) -> char {
         self.answer.chars().nth(index).unwrap()
     }
 
+    /// Match letter at index of answer
+    /// 
+    /// * `index` - index for specific letter of answer
+    /// * `letter` - letter being compared to letter at index
     fn matches_answer_at_index(&self, index: usize, letter: char) -> bool {
         letter == self.answer_char_at_index(index)
     }
 
+    /// Determine the state of the current row, for the sake of marking which cells
+    /// contain letters in the right place, wrong place, or not in the word at all
     fn recalculate_row_states(&mut self) -> () {
         let number_of_guesses_so_far = self.guesses().len();
 
@@ -174,6 +197,8 @@ impl Game {
         ()
     }
 
+    /// Update the registry of letters available for the answer depending on the
+    /// previous guesses
     fn recalculate_played_letter_registry(&mut self, guess: &WordGuess) -> () {
         for gl in guess.letters() {
             match self.played_letters.get_mut(&gl.letter) {
@@ -189,11 +214,18 @@ impl Game {
         }
     }
 
+    /// Check for duplicate guesses to prevent the same word being entered twice
+    /// 
+    /// * `guess_input` - guess input as a string to be check with previous guesses
     fn guess_already_exists(&self, guess_input: &str) -> bool {
         let existing_guesses: Vec<String> = self.guesses.iter().map(|g| g.word()).collect();
         existing_guesses.contains(&guess_input.to_string())
     }
 
+    /// Make a guess to the game of a specific input.
+    /// Returning game status after guess and result of guess.
+    /// 
+    /// * `guess_input` - the guess made
     pub fn guess(&mut self, guess_input: &str) -> (GameStatus, GuessResult) {
         if self.game_status == GameStatus::Won || self.game_status == GameStatus::Lost {
             return (self.game_status, GuessResult::GameIsAlreadyOver);
@@ -263,6 +295,7 @@ impl Game {
         (self.game_status, GuessResult::Valid)
     }
 
+    /// Obtain the current states of the rows
     pub fn row_states(&self) -> Vec<RowState> {
         self.row_states.clone()
     }
@@ -275,6 +308,9 @@ impl Game {
         }
     }
 
+    /// Build a guess from the current guess input
+    /// 
+    /// * `guess_input` - the guess being made
     fn build_guess(&mut self, guess_input: &str) -> WordGuess {
         let mut discoverable_letters = utils::build_letter_counts(&self.answer);
         let mut guess_letters: Vec<Option<GuessLetter>> = vec![None, None, None, None, None];
@@ -301,6 +337,11 @@ impl Game {
         }
     }
 
+    /// Build guess including the accuracy of a letter in the guess
+    /// 
+    /// * `letter_index` - index of letter
+    /// * `raw_letter` - character value of the letter
+    /// * `discoverable_letters` - list of letters that can be discovered
     fn build_guess_letter_with_accuracy(
         &mut self,
         letter_index: usize,
@@ -339,6 +380,7 @@ impl Game {
         }
     }
 
+    /// Get the accuracy of the letter from the currently played letters
     pub fn get_letter_match_state(&self, letter: char) -> Option<HitAccuracy> {
         self.played_letters.get(&letter).cloned()
     }
@@ -416,6 +458,37 @@ mod tests {
         };
         assert_eq!(game.guesses[0], spell_guess)
     }
+
+    #[test]
+    fn test_answer_at_index() {
+        let game = Game::new(GameOptions { answer: Some("ahead".to_string()), difficulty: GameDifficulty::Easy});
+
+        assert_eq!(game.answer_char_at_index(4), 'd');
+    }
+
+    #[test]
+    fn test_answer_at_index_out_of_bounds() {
+        let game = Game::new(GameOptions { answer: Some("ahead".to_string()), difficulty: GameDifficulty::Easy});
+
+        // it must return a character, so if invalid it could return a null character
+        assert_eq!(game.answer_char_at_index(6), '\0');
+    }
+
+    #[test]
+    fn test_matches_answer_at_index() {
+        let game = Game::new(GameOptions { answer: Some("ahead".to_string()), difficulty: GameDifficulty::Easy});
+
+        assert!(game.matches_answer_at_index(4, 'd'));
+    }
+
+    #[test]
+    fn test_matches_answer_at_index_out_of_bounds() {
+        let game = Game::new(GameOptions { answer: Some("ahead".to_string()), difficulty: GameDifficulty::Easy});
+
+        // it must return a character, so if invalid it could return a null character
+        assert!(game.matches_answer_at_index(6, '\0'));
+    }
+    
 
     #[test]
     fn test_cannot_add_duplicate_guess() {

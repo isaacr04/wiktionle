@@ -37,6 +37,10 @@ const CELL_WIDTH: usize = 5;
 const CELL_HEIGHT: usize = 3;
 const PADDING: usize = 1;
 
+/// Draw the current frame of the app given the current app state and a terminal frame to draw in
+/// 
+/// * `frame` - frame that is the terminal the game is played in
+/// * `app` - the app of the game to represent to the terminal
 pub fn draw<B: Backend>(frame: &mut Frame<B>, app: &mut App) -> Result<(), crate::ui::Error> {
     // a LOT of this code comes from a Minesweeper implementation in Rust, found at:
     // https://github.com/cpcloud/minesweep-rs/blob/main/src/ui.rs
@@ -135,6 +139,11 @@ pub fn draw<B: Backend>(frame: &mut Frame<B>, app: &mut App) -> Result<(), crate
     Ok(())
 }
 
+/// Helper function to render an empty row when there is nothing to add
+/// 
+/// * `frame` - terminal frame being used
+/// * `app` - current app and all it's states
+/// * `cell_chunks` - cells of the board
 pub fn render_empty_row<B: Backend>(
     frame: &mut Frame<B>,
     app: &mut App,
@@ -155,6 +164,11 @@ pub fn render_empty_row<B: Backend>(
     }
 }
 
+/// Helper function rendering contents of an active row
+/// 
+/// * `frame` - terminal frame being used
+/// * `app` - current app and all it's states
+/// * `cell_chunks` - cells of the board
 pub fn render_active_row<B: Backend>(
     frame: &mut Frame<B>,
     app: &mut App,
@@ -180,6 +194,11 @@ pub fn render_active_row<B: Backend>(
     }
 }
 
+/// Helper function to render contents of previous rows
+/// 
+/// * `frame` - terminal frame being used
+/// * `app` - current app and all it's states
+/// * `cell_chunks` - cells of the board
 pub fn render_already_guessed_row<B: Backend>(
     frame: &mut Frame<B>,
     app: &mut App,
@@ -219,6 +238,10 @@ pub fn render_already_guessed_row<B: Backend>(
     }
 }
 
+/// Helper function to render text using the given theme
+/// 
+/// * `text` - text being rendered to the terminal
+/// * `block_theme` - theme used to style text
 pub fn render_cell_with_text_and_colors(
     text: String,
     block_theme: BlockTheme,
@@ -241,8 +264,12 @@ pub fn render_cell_with_text_and_colors(
         .style(Style::default().fg(block_theme.text_color))
 }
 
-// This is taken directly from the minesweeper app
-// https://github.com/cpcloud/minesweep-rs/blob/main/src/ui.rs
+/// This is taken directly from the minesweeper app
+/// * https://github.com/cpcloud/minesweep-rs/blob/main/src/ui.rs
+/// 
+/// format text in the cell
+/// 
+/// * `text` - text being formatted to match cell parameters
 fn formatted_cell_text(text: String) -> String {
     let single_row_text = format!("{:^length$}", text, length = CELL_WIDTH - 2);
     let pad_line = " ".repeat(CELL_WIDTH);
@@ -256,6 +283,11 @@ fn formatted_cell_text(text: String) -> String {
         .join("\n")
 }
 
+/// Draw header (disclaimer/message) to terminal frame
+/// 
+/// * `frame` - terminal window displayed to user
+/// * `app` - app represented in ui to the terminal
+/// * `chunk` - the rectangle where the message is displayed
 pub fn draw_header<B: Backend>(frame: &mut Frame<B>, app: &mut App, chunk: Rect) {
     let text = match &app.disclaimer {
         Some(GameWonMessage) => String::from("Game is over! You win! Press any key to exit."),
@@ -308,6 +340,11 @@ pub fn draw_header<B: Backend>(frame: &mut Frame<B>, app: &mut App, chunk: Rect)
     frame.render_widget(header_text, chunk);
 }
 
+/// Draw the letters available for the guess in the bottom rectangle
+/// 
+/// * `frame` - terminal window displayed to user
+/// * `app` - app represented in ui to the terminal
+/// * `chunk` - the rectangle where the available letters are displayed
 pub fn draw_keyboard<B: Backend>(frame: &mut Frame<B>, app: &mut App, chunk: Rect) {
     let keyboard_key_rows = vec!["qwertyuiop", "asdfghjkl", "zxcvbnm"];
     let keyboard_spans = keyboard_key_rows
@@ -343,6 +380,12 @@ pub fn draw_keyboard<B: Backend>(frame: &mut Frame<B>, app: &mut App, chunk: Rec
     frame.render_widget(keyboard_visualization, chunk);
 }
 
+/// Color letters based on what is known to not be in the word, what is in the right place
+/// and what is not in the word
+/// 
+/// * `app` - current app and it's state
+/// * `le` - character(letter) being checked
+/// * `use_offset` - flag determining whether a space needs to be included afeter the letter
 pub fn keyboard_letter<'a>(app: &'a App, le: char, use_offset: bool) -> Span<'a> {
     use HitAccuracy::*;
     let key_state = app.game.get_letter_match_state(le);

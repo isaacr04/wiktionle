@@ -71,7 +71,10 @@ pub fn draw<B: Backend>(frame: &mut Frame<B>, app: &mut App) -> Result<(), crate
 
     let game_rectangle = outer_rects[0];
 
-    let horizontal_pad_block_width = (terminal_rect.width - grid_width) / 2;
+    let mut horizontal_pad_block_width = 0;
+    if terminal_rect.width.checked_sub(grid_width) != None {
+        horizontal_pad_block_width = (terminal_rect.width - grid_width) / 2;
+    }
     let center_center_horizontally = Layout::default()
         .direction(Direction::Horizontal)
         .constraints(vec![
@@ -81,7 +84,10 @@ pub fn draw<B: Backend>(frame: &mut Frame<B>, app: &mut App) -> Result<(), crate
         ])
         .split(game_rectangle);
 
-    let vertical_pad_block_height = (game_rectangle.height - grid_height) / 2;
+    let mut vertical_pad_block_height = 0;
+    if game_rectangle.height.checked_sub(grid_height) != None {
+        vertical_pad_block_height = (game_rectangle.height - grid_height) / 2;
+    }
     let center_content_vertically = Layout::default()
         .direction(Direction::Vertical)
         .constraints(vec![

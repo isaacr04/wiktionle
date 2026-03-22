@@ -26,7 +26,7 @@ pub struct AppOptions {
 /// Encapsulates together, the game, the theme, input handling, and primary app logic
 impl App {
     /// Constructor for an app given a set of arguments
-    /// 
+    ///
     /// * `args` - defines theme and game options of game instance used by the app
     pub fn new(args: AppOptions) -> Self {
         App {
@@ -39,7 +39,7 @@ impl App {
     }
 
     /// Handle key events, determining which action should be taken depending on input
-    /// 
+    ///
     /// * `key` - The key event resulting from a user's input
     pub fn on_key(&mut self, key: KeyEvent) -> () {
         if self.game.game_status() != GameStatus::InProgress {
@@ -121,7 +121,7 @@ mod tests {
 
     /// Setup function preparing a test app
     /// with set settings and no answer
-    /// 
+    ///
     /// * `answer` - the word the user will guess
     fn setup_app(answer: Option<String>) -> App {
         let difficulty = GameDifficulty::Easy;
@@ -137,7 +137,7 @@ mod tests {
     }
 
     /// Helper function to make a quick key event based on keycode
-    /// 
+    ///
     /// * `key_code` - Code of the key input recieved by app
     fn make_key_event(key_code: KeyCode) -> KeyEvent {
         let modifiers = KeyModifiers::empty();
@@ -146,7 +146,7 @@ mod tests {
     }
 
     /// Helper function to enter letters into app using on_key
-    /// 
+    ///
     /// * `app` - instance of the app where game is played
     /// * `word` - string of user inputs processed by app
     fn app_enter_letters(app: &mut App, word: &str) -> () {
@@ -347,7 +347,6 @@ mod tests {
         app.on_key(make_key_event(KeyCode::Backspace));
         app.on_key(make_key_event(KeyCode::Backspace));
 
-    
         app_enter_letters(&mut app, "valid");
         assert_eq!(app.input, "valid");
 

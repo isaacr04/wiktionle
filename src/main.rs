@@ -15,7 +15,7 @@ use clap::Parser;
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 use std::io;
 use std::time::Duration;
-use tui::{backend::CrosstermBackend, Terminal};
+use tui::{Terminal, backend::CrosstermBackend};
 
 #[derive(Parser, Debug)]
 #[clap(about = "Wordlet is a command line Wordle clone.", version, author)]

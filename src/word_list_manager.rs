@@ -169,8 +169,7 @@ impl WordListManager {
             .iter()
             .filter(|e| e.length == word_length)
             .collect();
-        pool.choose(&mut rand::thread_rng())
-            .map(|e| (*e).clone())
+        pool.choose(&mut rand::thread_rng()).map(|e| (*e).clone())
     }
 
     /// Return the `(earliest_date, latest_date)` of all records on file.
@@ -232,15 +231,22 @@ impl WordListManager {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
     use rstest::*;
 
     #[fixture]
-    fn word_entry(#[default("Word")] word: impl Into<String>, #[default("Part")] part_of_speech: impl Into<String>, #[default("Definition")] definition: impl Into<String>) -> WordEntry {
-        WordEntry::new(word, NaiveDate::default(), part_of_speech, definition)
+    fn word_entry(
+        #[default("Word")] word: impl Into<String>,
+        #[default("2000-01-01")] date: &str,
+        #[default("Part")] part_of_speech: impl Into<String>,
+        #[default("Definition")] definition: impl Into<String>,
+    ) -> WordEntry {
+        match NaiveDate::parse_from_str(date, "%Y-%m-%d") {
+            Ok(date) => WordEntry::new(word, date, part_of_speech, definition),
+            Err(_error) => WordEntry::new(word, NaiveDate::default(), part_of_speech, definition),
+        }
     }
 
     #[fixture]
@@ -254,23 +260,17 @@ mod tests {
     #[case::file_given("Cargo.lock", false)] // read invalid file, no words will be read
     fn test_create_word_list(#[case] path: &str, #[case] expect_filled: bool) {
         match word_list_manager(path) {
-            Ok(word_manager) => {
-                match expect_filled {
-                    true => {
-                        assert!(word_manager.entries.len() > 0);
-                    }
-                    false => {
-                        assert_eq!(word_manager.entries.len(), 0);
-                    }
+            Ok(word_manager) => match expect_filled {
+                true => {
+                    assert!(word_manager.entries.len() > 0);
                 }
-            }
-            Err(error) => {
+                false => {
+                    assert_eq!(word_manager.entries.len(), 0);
+                }
+            },
+            Err(_error) => {
                 assert!(false);
             }
         }
     }
-
-    
-
-
 }

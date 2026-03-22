@@ -3,6 +3,8 @@ mod engine;
 mod events;
 mod theme;
 mod ui;
+#[path = "./word_list_manager.rs"]
+mod word_list_manager;
 
 use crate::app::{App, AppOptions};
 use crate::engine::{GameDifficulty, GameOptions};

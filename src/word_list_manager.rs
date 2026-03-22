@@ -250,27 +250,83 @@ mod tests {
     }
 
     #[fixture]
-    fn word_list_manager(#[default("")] path: &str) -> Result<WordListManager, WordListError> {
-        WordListManager::new(path)
+    fn word_list_manager(#[default("test_words.json")] path: &str) -> WordListManager {
+        fs::remove_file("test_words.json"); // remove testing file if it exists to not interfere with current tests
+
+        match WordListManager::new(path) {
+            Ok(manager) => manager,
+            Err(_error) => {
+                assert!(false);
+                panic!("Unable to generate WordListManager for test");
+            }
+        }
     }
 
     #[rstest]
-    #[case::no_file_available("", false)] // No valid path is given, no words should be loaded
+    #[case::no_file_available("asdoaisfjaois.asfjas", false)] // No valid path is given, no words should be loaded
     #[case::file_given("wotd_words.json", true)] // Words are given, list manager will be populated
-    #[case::file_given("Cargo.lock", false)] // read invalid file, no words will be read
+    #[case::invalid_file_given("Cargo.lock", false)] // read invalid file, no words will be read
     fn test_create_word_list(#[case] path: &str, #[case] expect_filled: bool) {
-        match word_list_manager(path) {
-            Ok(word_manager) => match expect_filled {
-                true => {
-                    assert!(word_manager.entries.len() > 0);
-                }
-                false => {
-                    assert_eq!(word_manager.entries.len(), 0);
-                }
-            },
-            Err(_error) => {
-                assert!(false);
+        let word_list_manager = word_list_manager(path);
+        match expect_filled {
+            true => {
+                assert!(word_list_manager.entries.len() > 0);
+            }
+            false => {
+                assert_eq!(word_list_manager.entries.len(), 0);
             }
         }
+    }
+
+    #[rstest]
+    /// Would add more test cases for here, but it is redundant with the existance of the add_entries method
+    fn test_add_entry(word_list_manager: WordListManager, word_entry: WordEntry) {
+        let mut manager = word_list_manager;
+
+        match manager.add_entry(word_entry) {
+            Ok(true) => {
+                assert_eq!(manager.count(), 1);
+            }
+            Ok(false) => {
+                assert!(false)
+            }
+            Err(error) => {
+                assert!(false)
+            }
+        }
+    }
+
+    #[rstest]
+    #[case::add_one_entry(1, vec![ word_entry("Word1", "2000-01-01", "Part", "Definition") ]) ]
+    #[case::add_multiple_entries(5, vec![ word_entry("Word1", "2000-01-01", "Part", "Definition"), word_entry("Word2", "2000-01-02", "Part", "Definition"), word_entry("Word3", "2000-01-03", "Part", "Definition"), word_entry("Word4", "2000-01-04", "Part", "Definition"), word_entry("Word5", "2000-01-05", "Part", "Definition") ])]
+    #[case::add_5_entries_with_same_date(1, vec![ word_entry("What", "2000-01-01", "Part", "Definition"), word_entry("Is", "2000-01-01", "Part", "Definition"), word_entry("This", "2000-01-01", "Part", "Definition"), word_entry("Doing", "2000-01-01", "Part", "Definition"), word_entry("Man", "2000-01-01", "Part", "Definition") ])]
+    #[case::add_duplicate_entries_then_new_entry(2, vec![ word_entry("Word1", "2000-01-01", "Part", "Definition"), word_entry("Word2", "2000-01-01", "Part", "Definition"), word_entry("Word3", "2000-01-01", "Part", "Definition"), word_entry("Word4", "2000-01-01", "Part", "Definition"), word_entry("Word5", "2000-01-04", "Part", "Definition") ])]
+    fn test_add_entries(
+        word_list_manager: WordListManager,
+        #[case] expected_count: usize,
+        #[case] entries: Vec<WordEntry>,
+    ) {
+        let mut manager = word_list_manager;
+
+        for entry in entries {
+            match manager.add_entry(entry) {
+                Ok(true) => {
+                    assert!(true);
+                }
+                Ok(false) => {
+                    assert!(true);
+                }
+                Err(_error) => {
+                    assert!(false);
+                }
+            }
+        }
+
+        for entry in manager.all_entries() {
+            let word = entry.word.to_string();
+            println!("{word}");
+        }
+
+        assert_eq!(manager.count(), expected_count);
     }
 }

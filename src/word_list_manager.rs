@@ -231,3 +231,46 @@ impl WordListManager {
         Ok(())
     }
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rstest::*;
+
+    #[fixture]
+    fn word_entry(#[default("Word")] word: impl Into<String>, #[default("Part")] part_of_speech: impl Into<String>, #[default("Definition")] definition: impl Into<String>) -> WordEntry {
+        WordEntry::new(word, NaiveDate::default(), part_of_speech, definition)
+    }
+
+    #[fixture]
+    fn word_list_manager(#[default("")] path: &str) -> Result<WordListManager, WordListError> {
+        WordListManager::new(path)
+    }
+
+    #[rstest]
+    #[case::no_file_available("", false)] // No valid path is given, no words should be loaded
+    #[case::file_given("wotd_words.json", true)] // Words are given, list manager will be populated
+    #[case::file_given("Cargo.lock", false)] // read invalid file, no words will be read
+    fn test_create_word_list(#[case] path: &str, #[case] expect_filled: bool) {
+        match word_list_manager(path) {
+            Ok(word_manager) => {
+                match expect_filled {
+                    true => {
+                        assert!(word_manager.entries.len() > 0);
+                    }
+                    false => {
+                        assert_eq!(word_manager.entries.len(), 0);
+                    }
+                }
+            }
+            Err(error) => {
+                assert!(false);
+            }
+        }
+    }
+
+    
+
+
+}

@@ -58,11 +58,7 @@ pub struct WordGuess {
 impl WordGuess {
     /// Convert the Guess from a Vector of Guess Letters to a String representation
     pub fn word(&self) -> String {
-        self.letters
-            .as_slice()
-            .iter()
-            .map(|gl| gl.letter)
-            .collect()
+        self.letters.as_slice().iter().map(|gl| gl.letter).collect()
     }
 
     /// Get all individual letters of the word
@@ -462,25 +458,37 @@ mod tests {
 
     #[test]
     fn test_answer_at_index() {
-        let game = Game::new(GameOptions { answer: Some("ahead".to_string()), difficulty: GameDifficulty::Easy});
+        let game = Game::new(GameOptions {
+            answer: Some("ahead".to_string()),
+            difficulty: GameDifficulty::Easy,
+        });
         assert_eq!(game.answer_char_at_index(4), 'd');
     }
 
     #[test]
     fn test_answer_at_index_out_of_bounds() {
-        let game = Game::new(GameOptions { answer: Some("ahead".to_string()), difficulty: GameDifficulty::Easy});
+        let game = Game::new(GameOptions {
+            answer: Some("ahead".to_string()),
+            difficulty: GameDifficulty::Easy,
+        });
         assert_eq!(game.answer_char_at_index(6), '\0');
     }
 
     #[test]
     fn test_matches_answer_at_index() {
-        let game = Game::new(GameOptions { answer: Some("ahead".to_string()), difficulty: GameDifficulty::Easy});
+        let game = Game::new(GameOptions {
+            answer: Some("ahead".to_string()),
+            difficulty: GameDifficulty::Easy,
+        });
         assert!(game.matches_answer_at_index(4, 'd'));
     }
 
     #[test]
     fn test_matches_answer_at_index_out_of_bounds() {
-        let game = Game::new(GameOptions { answer: Some("ahead".to_string()), difficulty: GameDifficulty::Easy});
+        let game = Game::new(GameOptions {
+            answer: Some("ahead".to_string()),
+            difficulty: GameDifficulty::Easy,
+        });
         assert!(game.matches_answer_at_index(6, '\0'));
     }
 

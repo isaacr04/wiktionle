@@ -54,7 +54,7 @@ impl Events {
     /// a lot of this code comes from these two sources:
     /// * https://github.com/deepu105/battleship-rs/blob/main/src/event.rs
     /// * https://github.com/zupzup/rust-commandline-example/blob/main/src/main.rs
-    /// 
+    ///
     /// Define new event handler of a given tick rate determining how often input is read for
     /// * All events are checked in a seperate thread in an infinite loop, to not interrupt main program execution
     pub fn new(tick_rate: Duration) -> Self {

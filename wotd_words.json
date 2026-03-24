@@ -2100,6 +2100,13 @@
     "definition": "(intransitive) To emit heat and light without a flame. Of a fire: to emit heat and light. To emit light brightly and steadily as if heated to a high temperature; to shine. To be very hot; also, to be on fire; to burn. (figurative) Of a colour: to be bright; also, of a thing: to have a bright colour. Of a person: to display intense emotion. Of a person's body or a part of it: to feel hot and often to flush (“become suffused with a reddish colour”) as well, due to an emotional response, exertion, etc. (chiefly US, Internet slang) To be involved in an (chiefly online) undercover sting operation, especially by American federal agencies."
   },
   {
+    "word": "bode",
+    "length": 4,
+    "date_featured": "2026-03-16",
+    "part_of_speech": "v",
+    "definition": "(transitive) Of a thing: to be an indication, omen, or sign of (something); to portend. (archaic) To declare (something, such as a future event) before it occurs; to foretell, to predict; specifically, to predict (something undesirable); to forebode."
+  },
+  {
     "word": "brume",
     "length": 5,
     "date_featured": "2006-01-18",
@@ -5374,6 +5381,13 @@
     "date_featured": "2026-02-25",
     "part_of_speech": "n",
     "definition": "A tiny particle; an atom, a mote, a speck. A floating mote or speck of dust. (archaic) The smallest, indivisible constituent part or unit of something; an atom."
+  },
+  {
+    "word": "lurgy",
+    "length": 5,
+    "date_featured": "2026-03-17",
+    "part_of_speech": "n",
+    "definition": "Chiefly preceded by the. (chiefly England (Cornwall, Northern England), Ireland, archaic) Idleness or laziness regarded as a medical condition; also, depression, especially resulting from a hangover. (possibly by extension, originally UK military slang, now chiefly Australia, Ireland, New Zealand, UK) A non-specific (often infectious) disease, especially one with symptoms similar to those of a cold or flu, which renders one unfit to attend social events, go to work, etc."
   },
   {
     "word": "bothy",
@@ -10533,6 +10547,13 @@
     "date_featured": "2026-03-11",
     "part_of_speech": "n",
     "definition": "(countable) A confused sound of a crowd of people shouting or speaking simultaneously; an uproar."
+  },
+  {
+    "word": "attain",
+    "length": 6,
+    "date_featured": "2026-03-18",
+    "part_of_speech": "v",
+    "definition": "(transitive) To come to or reach (a place) by motion or progression. (figurative) To arrive at (a certain age or time, condition or state, etc.); to reach. To gain (a desired result or other objective) through effort; to accomplish, to achieve. (archaic) To gain possession of (something tangible or intangible) through effort; to acquire, to obtain. (obsolete) To reach (someone) after being behind them. (figurative) To find out (information, knowledge, etc.); to ascertain, to get at."
   },
   {
     "word": "burgage",
@@ -16084,6 +16105,20 @@
     "date_featured": "2026-02-18",
     "part_of_speech": "v",
     "definition": "(transitive) (also figurative, obsolete) To make (someone or something) dirty; to bespatter, to soil. (by extension, US) To hit (someone or something) with a liquid; to splash, to spatter. (figurative) To approach or study (something, such as a subject) superficially; to dabble in. To speak (a language or words) with only a superficial knowledge of it."
+  },
+  {
+    "word": "détente",
+    "length": 7,
+    "date_featured": "2026-03-20",
+    "part_of_speech": "n",
+    "definition": "(chiefly politics, uncountable) Relaxing of tension, especially between countries; (countable) an instance of this."
+  },
+  {
+    "word": "shadoof",
+    "length": 7,
+    "date_featured": "2026-03-22",
+    "part_of_speech": "n",
+    "definition": "A device used since ancient times in the Middle East to raise water from a well or other low point, consisting of a pivoted rod with a bucket on one end and a counterweight on the other."
   },
   {
     "word": "sybarite",
@@ -27755,6 +27790,13 @@
     "definition": "(transitive) To convey (information, a message, news, etc.) using a telephone (noun sense 1). To (attempt to) contact (someone) using a telephone. (obsolete) To provide (a place) with a telephone system. To transmit (sounds) over a distance."
   },
   {
+    "word": "concierge",
+    "length": 9,
+    "date_featured": "2026-03-15",
+    "part_of_speech": "n",
+    "definition": "An employee of a hotel who attends to the requirements and wishes of guests. (by extension, chiefly attributive) One who offers a bespoke level of service in any of various industries."
+  },
+  {
     "word": "vade mecum",
     "length": 10,
     "date_featured": "2006-01-16",
@@ -36043,6 +36085,13 @@
     "definition": "(idiomatic, informal) A short sleep, especially when taken during the day; a nap."
   },
   {
+    "word": "pandamonium",
+    "length": 11,
+    "date_featured": "2026-03-19",
+    "part_of_speech": "n",
+    "definition": "(humorous) Furore caused by or involving pandas (that is, giant pandas)."
+  },
+  {
     "word": "oniochalasia",
     "length": 12,
     "date_featured": "2006-01-27",
@@ -41622,6 +41671,13 @@
     "definition": "A person who constructs or solves crosswords."
   },
   {
+    "word": "transcendental",
+    "length": 14,
+    "date_featured": "2026-03-14",
+    "part_of_speech": "adj",
+    "definition": "Synonym of transcendent (“surpassing usual limits; excelling; extraordinary”)."
+  },
+  {
     "word": "anthropomorphic",
     "length": 15,
     "date_featured": "2006-02-25",
@@ -42439,6 +42495,13 @@
     "date_featured": "2026-01-05",
     "part_of_speech": "n",
     "definition": "(idiomatic) A situation where a person is presented with the illusion of a free choice, but in reality there is only one option available: accepting the offer or having nothing at all. (by extension, loosely) A choice between several undesirable options; Sophie's choice."
+  },
+  {
+    "word": "english cadence",
+    "length": 15,
+    "date_featured": "2026-10-01",
+    "part_of_speech": "n",
+    "definition": "(music) A perfect cadence characteristic of English Renaissance music, involving a flattened seventh note played against the dominant chord (containing a regular raised seventh). Conventionally, the flattened seventh is played as part of a suspension on the penultimate beat, before resolving downwards to the sixth and then fifth of the final chord, while the raised seventh is held before resolving upward to the first; however, more complex variations are also possible."
   },
   {
     "word": "tintinnabulation",
@@ -44322,6 +44385,13 @@
     "date_featured": "2025-12-04",
     "part_of_speech": "phrase",
     "definition": "(humorous, informal) Used to introduce something seen as inevitable or totally commonplace."
+  },
+  {
+    "word": "wagger-pagger-bagger",
+    "length": 20,
+    "date_featured": "2026-03-21",
+    "part_of_speech": "n",
+    "definition": "(originally Oxford University slang, now British slang, humorous, dated) A wastepaper basket."
   },
   {
     "word": "not in kansas anymore",

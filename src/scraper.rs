@@ -33,8 +33,7 @@ use std::time::Duration;
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ARCHIVE_BASE: &str =
-    "https://en.wiktionary.org/wiki/Wiktionary:Word_of_the_day/Archive";
+const ARCHIVE_BASE: &str = "https://en.wiktionary.org/wiki/Wiktionary:Word_of_the_day/Archive";
 
 const DEFAULT_OUTPUT: &str = "wotd_words.json";
 
@@ -42,8 +41,18 @@ const REQUEST_DELAY_MS: u64 = 600;
 const BATCH_SIZE: usize = 50;
 
 const MONTHS: [&str; 12] = [
-    "January", "February", "March", "April", "May", "June", "July", "August", "September",
-    "October", "November", "December",
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -79,11 +88,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .map(parse_year_month)
         .transpose()?;
 
-    let end_date = args
-        .end_date
-        .as_deref()
-        .map(parse_year_month)
-        .transpose()?;
+    let end_date = args.end_date.as_deref().map(parse_year_month).transpose()?;
 
     let mut manager = WordListManager::new(&args.output)?;
 
@@ -172,7 +177,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("  — Saved final batch of {n} entries.");
     }
 
-    println!("\n✓ Complete. {} entries in '{}'.", manager.count(), args.output);
+    println!(
+        "\n✓ Complete. {} entries in '{}'.",
+        manager.count(),
+        args.output
+    );
 
     Ok(())
 }
@@ -215,10 +224,7 @@ fn parse_month_archive(html: &str, year: i32, month_name: &str) -> Vec<(NaiveDat
 // Entry parsing
 // ─────────────────────────────────────────────────────────────────────────────
 
-fn parse_wotd_block(
-    html: &str,
-    date: NaiveDate,
-) -> Result<WordEntry, Box<dyn std::error::Error>> {
+fn parse_wotd_block(html: &str, date: NaiveDate) -> Result<WordEntry, Box<dyn std::error::Error>> {
     let doc = Html::parse_fragment(html);
 
     let word_sel = Selector::parse("#WOTD-rss-title").unwrap();
@@ -320,7 +326,9 @@ fn month_is_fully_cached(
 
     let effective_last_day = match end {
         Some((end_year, end_month)) if (year, month) == (end_year, end_month) => {
-            let capped = last_day_of_month.day().min(days_in_month(end_year, end_month));
+            let capped = last_day_of_month
+                .day()
+                .min(days_in_month(end_year, end_month));
             match NaiveDate::from_ymd_opt(end_year, end_month, capped) {
                 Some(d) => d,
                 None => last_day_of_month,

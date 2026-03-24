@@ -10,12 +10,37 @@ on:
     paths:
       - 'src/**'
 
+# Minimum permissions required by skip-duplicate-actions
+permissions:
+  actions: write
+  contents: read
+  pull-requests: write
+  
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build_and_test:
+  check-duplicate:
+    # First thing if there are any duplicate actions skip them
+    # otherwise it runs twice on pull requests
+    runs-on: ubuntu-latest
 
+    # Track should skip status
+    outputs:
+      should_skip: ${{ steps.skip-check.outputs.should_skip }}
+
+    steps:
+    - id: skip-check
+      uses: fkirc/skip-duplicate-actions@v5.3.1
+      with:
+        concurrent_skipping: 'same_content'
+        do_not_skip: '["pull_request"]'
+
+
+  build_and_test:
+    needs: check-duplicate
+    # if no duplicate actions are occuring then run tests and coverage
+    if: needs.check-duplicate.outputs.should_skip != 'true'
     runs-on: ubuntu-latest
 
     steps:

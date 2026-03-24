@@ -41,7 +41,7 @@ impl App {
     /// Handle key events, determining which action should be taken depending on input
     /// 
     /// * `key` - The key event resulting from a user's input
-    pub fn on_key(&mut self, key: KeyEvent) -> () {
+    pub fn on_key(&mut self, key: KeyEvent, word_length: usize) -> () {
         if self.game.game_status() != GameStatus::InProgress {
             self.should_quit = true;
             return;
@@ -52,8 +52,8 @@ impl App {
                 self.should_quit = true;
             }
             KeyCode::Backspace => self.on_backspace(),
-            KeyCode::Enter => self.on_enter_press(),
-            KeyCode::Char(letter) => self.on_letter_entered(letter),
+            KeyCode::Enter => self.on_enter_press(word_length),
+            KeyCode::Char(letter) => self.on_letter_entered(letter, word_length),
             _ => (),
         };
     }
@@ -71,8 +71,8 @@ impl App {
     }
 
     /// On letter input it is appended to the current input limited to 5 characters
-    pub fn on_letter_entered(&mut self, letter: char) -> () {
-        if self.input.chars().count() <= 4 {
+    pub fn on_letter_entered(&mut self, letter: char, word_length: usize) -> () {
+        if self.input.chars().count() < word_length {
             self.input.push(letter);
         }
     }
@@ -81,17 +81,17 @@ impl App {
     /// * display disclaimer for invalid input, or other messages
     /// * checks if input was correct or wrong and display correct disclaimer
     /// * checks if game was lost
-    pub fn on_enter_press(&mut self) -> () {
+    pub fn on_enter_press(&mut self, word_length: usize) -> () {
         // clear the disclaimer the first time a word is played
         if self.disclaimer == Some(Disclaimer::WelcomeMessage) {
             self.disclaimer = None;
         }
 
-        if &self.input.chars().count() != &5 {
+        if &self.input.chars().count() != &word_length {
             return ();
         }
 
-        match self.game.guess(&self.input) {
+        match self.game.guess(&self.input, word_length) {
             (GameStatus::Lost, _) => {
                 if let Ok(answer) = self.game.get_answer() {
                     self.disclaimer = Some(Disclaimer::GameOverMessage(answer.to_string()));
@@ -131,6 +131,7 @@ mod tests {
             game_config: GameOptions {
                 answer: answer,
                 difficulty: difficulty,
+                word_length: 5,
             },
         });
         app
@@ -151,7 +152,7 @@ mod tests {
     /// * `word` - string of user inputs processed by app
     fn app_enter_letters(app: &mut App, word: &str) -> () {
         for character in word.chars() {
-            app.on_key(make_key_event(KeyCode::Char(character)));
+            app.on_key(make_key_event(KeyCode::Char(character)), 5);
         }
     }
 
@@ -159,7 +160,7 @@ mod tests {
     /// Test escape quitting game
     fn test_on_key_escape() {
         let mut app = setup_app(None);
-        app.on_key(make_key_event(KeyCode::Esc));
+        app.on_key(make_key_event(KeyCode::Esc), 5);
         assert!(app.should_quit)
     }
 
@@ -187,19 +188,19 @@ mod tests {
 
         assert_eq!(app.input, "Hello");
 
-        app.on_key(make_key_event(KeyCode::Backspace)); // Hell
+        app.on_key(make_key_event(KeyCode::Backspace), 5); // Hell
         assert_eq!(app.input, "Hell");
 
-        app.on_key(make_key_event(KeyCode::Backspace)); // Hel
+        app.on_key(make_key_event(KeyCode::Backspace), 5); // Hel
         assert_eq!(app.input, "Hel");
 
-        app.on_key(make_key_event(KeyCode::Backspace)); // He
+        app.on_key(make_key_event(KeyCode::Backspace), 5); // He
         assert_eq!(app.input, "He");
 
-        app.on_key(make_key_event(KeyCode::Backspace)); // H
+        app.on_key(make_key_event(KeyCode::Backspace), 5); // H
         assert_eq!(app.input, "H");
 
-        app.on_key(make_key_event(KeyCode::Backspace)); // should be empty
+        app.on_key(make_key_event(KeyCode::Backspace), 5); // should be empty
         assert_eq!(app.input, "");
     }
 
@@ -210,7 +211,7 @@ mod tests {
         app.input = "".to_string();
 
         // with an empty input using backspace should do nothing
-        app.on_key(make_key_event(KeyCode::Backspace));
+        app.on_key(make_key_event(KeyCode::Backspace), 5);
         assert_eq!(app.input, "");
     }
 
@@ -219,9 +220,9 @@ mod tests {
     fn test_on_letter_entered() {
         let mut app = setup_app(None);
 
-        app.on_key(make_key_event(KeyCode::Char('a')));
-        app.on_key(make_key_event(KeyCode::Char('b')));
-        app.on_key(make_key_event(KeyCode::Char('c')));
+        app.on_key(make_key_event(KeyCode::Char('a')), 5);
+        app.on_key(make_key_event(KeyCode::Char('b')), 5);
+        app.on_key(make_key_event(KeyCode::Char('c')), 5);
 
         assert_eq!(app.input, "abc")
     }
@@ -230,9 +231,9 @@ mod tests {
     fn test_on_invalid_letter_entered() {
         let mut app = setup_app(None);
 
-        app.on_key(make_key_event(KeyCode::Char('a')));
-        app.on_key(make_key_event(KeyCode::Char('#')));
-        app.on_key(make_key_event(KeyCode::Char(' ')));
+        app.on_key(make_key_event(KeyCode::Char('a')), 5);
+        app.on_key(make_key_event(KeyCode::Char('#')), 5);
+        app.on_key(make_key_event(KeyCode::Char(' ')), 5);
 
         assert_eq!(app.input, "a")
     }
@@ -244,7 +245,7 @@ mod tests {
 
         assert!(app.disclaimer == Some(Disclaimer::WelcomeMessage)); // initialized with welcome
 
-        app.on_key(make_key_event(KeyCode::Enter));
+        app.on_key(make_key_event(KeyCode::Enter), 5);
         assert!(app.disclaimer == None); // disclaimer cleared
     }
 
@@ -254,13 +255,13 @@ mod tests {
         let mut app = setup_app(Some("train".to_string()));
 
         // Train entered
-        app.on_key(make_key_event(KeyCode::Char('t')));
-        app.on_key(make_key_event(KeyCode::Char('r')));
-        app.on_key(make_key_event(KeyCode::Char('a')));
-        app.on_key(make_key_event(KeyCode::Char('i')));
-        app.on_key(make_key_event(KeyCode::Char('n')));
+        app.on_key(make_key_event(KeyCode::Char('t')), 5);
+        app.on_key(make_key_event(KeyCode::Char('r')), 5);
+        app.on_key(make_key_event(KeyCode::Char('a')), 5);
+        app.on_key(make_key_event(KeyCode::Char('i')), 5);
+        app.on_key(make_key_event(KeyCode::Char('n')), 5);
 
-        app.on_key(make_key_event(KeyCode::Enter));
+        app.on_key(make_key_event(KeyCode::Enter), 5);
         assert!(app.disclaimer == Some(Disclaimer::GameWonMessage)); // game won
     }
 
@@ -271,7 +272,7 @@ mod tests {
 
         app_enter_letters(&mut app, "TRain");
 
-        app.on_key(make_key_event(KeyCode::Enter));
+        app.on_key(make_key_event(KeyCode::Enter), 5);
         assert!(app.disclaimer == Some(Disclaimer::GameWonMessage)); // game won
     }
 
@@ -282,7 +283,7 @@ mod tests {
 
         app_enter_letters(&mut app, "train");
 
-        app.on_key(make_key_event(KeyCode::Enter));
+        app.on_key(make_key_event(KeyCode::Enter), 5);
         assert!(app.disclaimer == None); // no response is given move to the next word
         assert_eq!(app.input, ""); // word cleared in preparation for next
     }
@@ -293,7 +294,7 @@ mod tests {
 
         app_enter_letters(&mut app, "tr@15");
 
-        app.on_key(make_key_event(KeyCode::Enter));
+        app.on_key(make_key_event(KeyCode::Enter), 5);
         assert!(app.disclaimer == None); // disclaimer shouldn't be anything
     }
 
@@ -302,33 +303,33 @@ mod tests {
         let mut app = setup_app(Some("input".to_string()));
 
         app_enter_letters(&mut app, "train");
-        app.on_key(make_key_event(KeyCode::Enter));
+        app.on_key(make_key_event(KeyCode::Enter), 5);
         assert!(app.disclaimer == None); // no disclaimer
         assert_eq!(app.input, ""); // word cleared
 
         app_enter_letters(&mut app, "plain");
-        app.on_key(make_key_event(KeyCode::Enter));
+        app.on_key(make_key_event(KeyCode::Enter), 5);
         assert!(app.disclaimer == None); // no disclaimer
         assert_eq!(app.input, ""); // word cleared
 
         app_enter_letters(&mut app, "faint");
-        app.on_key(make_key_event(KeyCode::Enter));
+        app.on_key(make_key_event(KeyCode::Enter), 5);
         assert!(app.disclaimer == None); // no disclaimer
         assert_eq!(app.input, ""); // word cleared
 
         app_enter_letters(&mut app, "claim");
-        app.on_key(make_key_event(KeyCode::Enter));
+        app.on_key(make_key_event(KeyCode::Enter), 5);
         assert!(app.disclaimer == None); // no disclaimer
         assert_eq!(app.input, ""); // word cleared
 
         app_enter_letters(&mut app, "sword");
-        app.on_key(make_key_event(KeyCode::Enter));
+        app.on_key(make_key_event(KeyCode::Enter), 5);
         assert!(app.disclaimer == None); // no disclaimer
         assert_eq!(app.input, ""); // word cleared
 
         // Last word, end the game losing
         app_enter_letters(&mut app, "flail");
-        app.on_key(make_key_event(KeyCode::Enter));
+        app.on_key(make_key_event(KeyCode::Enter), 5);
         assert!(app.disclaimer.is_some()); // disclaimer given lost
         assert_eq!(app.game.game_status(), GameStatus::Lost)
     }
@@ -339,19 +340,19 @@ mod tests {
         let mut app = setup_app(None);
 
         app_enter_letters(&mut app, "asdas"); // not a word
-        app.on_key(make_key_event(KeyCode::Enter));
+        app.on_key(make_key_event(KeyCode::Enter), 5);
 
-        app.on_key(make_key_event(KeyCode::Backspace));
-        app.on_key(make_key_event(KeyCode::Backspace));
-        app.on_key(make_key_event(KeyCode::Backspace));
-        app.on_key(make_key_event(KeyCode::Backspace));
-        app.on_key(make_key_event(KeyCode::Backspace));
+        app.on_key(make_key_event(KeyCode::Backspace), 5);
+        app.on_key(make_key_event(KeyCode::Backspace), 5);
+        app.on_key(make_key_event(KeyCode::Backspace), 5);
+        app.on_key(make_key_event(KeyCode::Backspace), 5);
+        app.on_key(make_key_event(KeyCode::Backspace), 5);
 
     
         app_enter_letters(&mut app, "valid");
         assert_eq!(app.input, "valid");
 
-        app.on_key(make_key_event(KeyCode::Enter));
+        app.on_key(make_key_event(KeyCode::Enter), 5);
         assert!(app.disclaimer == None); // disclaimer should be cleared
     }
 }

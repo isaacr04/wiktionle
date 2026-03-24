@@ -236,29 +236,39 @@ mod tests {
     use super::*;
     use rstest::*;
 
-    #[fixture]
+    // #[default("Word")] word: impl Into<String>,
+    // #[default("2000-01-01")] date: &str,
+    // #[default("Part")] part_of_speech: impl Into<String>,
+    // #[default("Definition")] definition: impl Into<String>,
     fn word_entry(
-        #[default("Word")] word: impl Into<String>,
-        #[default("2000-01-01")] date: &str,
-        #[default("Part")] part_of_speech: impl Into<String>,
-        #[default("Definition")] definition: impl Into<String>,
+        word: impl Into<String>,
+        date: &str,
+        part_of_speech: impl Into<String>,
+        definition: impl Into<String>,
     ) -> WordEntry {
+        WordEntry::new(word, make_naive_date(date), part_of_speech, definition)
+    }
+
+    fn make_naive_date(date: &str) -> NaiveDate {
         match NaiveDate::parse_from_str(date, "%Y-%m-%d") {
-            Ok(date) => WordEntry::new(word, date, part_of_speech, definition),
-            Err(_error) => WordEntry::new(word, NaiveDate::default(), part_of_speech, definition),
+            Ok(date) => date,
+            Err(_error) => NaiveDate::default(),
         }
     }
 
-    #[fixture]
-    fn word_list_manager(#[default("test_words.json")] path: &str) -> WordListManager {
-        fs::remove_file("test_words.json"); // remove testing file if it exists to not interfere with current tests
+    /// Create a manager, the path doesn't matter, since I create it directly from the struct definition to avoid file weirdness
+    fn word_list_manager(word_entries: Vec<WordEntry>) -> WordListManager {
+        // match WordListManager::new(path) {
+        //     Ok(manager) => manager,
+        //     Err(_error) => {
+        //         assert!(false);
+        //         panic!("Unable to generate WordListManager for test");
+        //     }
+        // }
 
-        match WordListManager::new(path) {
-            Ok(manager) => manager,
-            Err(_error) => {
-                assert!(false);
-                panic!("Unable to generate WordListManager for test");
-            }
+        WordListManager {
+            file_path: "test_words.json".to_string(),
+            entries: word_entries,
         }
     }
 
@@ -267,31 +277,18 @@ mod tests {
     #[case::file_given("wotd_words.json", true)] // Words are given, list manager will be populated
     #[case::invalid_file_given("Cargo.lock", false)] // read invalid file, no words will be read
     fn test_create_word_list(#[case] path: &str, #[case] expect_filled: bool) {
-        let word_list_manager = word_list_manager(path);
-        match expect_filled {
-            true => {
-                assert!(word_list_manager.entries.len() > 0);
-            }
-            false => {
-                assert_eq!(word_list_manager.entries.len(), 0);
-            }
-        }
-    }
-
-    #[rstest]
-    /// Would add more test cases for here, but it is redundant with the existance of the add_entries method
-    fn test_add_entry(word_list_manager: WordListManager, word_entry: WordEntry) {
-        let mut manager = word_list_manager;
-
-        match manager.add_entry(word_entry) {
-            Ok(true) => {
-                assert_eq!(manager.count(), 1);
-            }
-            Ok(false) => {
-                assert!(false)
-            }
-            Err(error) => {
-                assert!(false)
+        match WordListManager::new(path) {
+            Ok(manager) => match expect_filled {
+                true => {
+                    assert!(manager.entries.len() > 0);
+                }
+                false => {
+                    assert_eq!(manager.entries.len(), 0);
+                }
+            },
+            Err(_error) => {
+                assert!(false);
+                panic!("Unable to generate WordListManager for test");
             }
         }
     }
@@ -301,12 +298,8 @@ mod tests {
     #[case::add_multiple_entries(5, vec![ word_entry("Word1", "2000-01-01", "Part", "Definition"), word_entry("Word2", "2000-01-02", "Part", "Definition"), word_entry("Word3", "2000-01-03", "Part", "Definition"), word_entry("Word4", "2000-01-04", "Part", "Definition"), word_entry("Word5", "2000-01-05", "Part", "Definition") ])]
     #[case::add_5_entries_with_same_date(1, vec![ word_entry("What", "2000-01-01", "Part", "Definition"), word_entry("Is", "2000-01-01", "Part", "Definition"), word_entry("This", "2000-01-01", "Part", "Definition"), word_entry("Doing", "2000-01-01", "Part", "Definition"), word_entry("Man", "2000-01-01", "Part", "Definition") ])]
     #[case::add_duplicate_entries_then_new_entry(2, vec![ word_entry("Word1", "2000-01-01", "Part", "Definition"), word_entry("Word2", "2000-01-01", "Part", "Definition"), word_entry("Word3", "2000-01-01", "Part", "Definition"), word_entry("Word4", "2000-01-01", "Part", "Definition"), word_entry("Word5", "2000-01-04", "Part", "Definition") ])]
-    fn test_add_entries(
-        word_list_manager: WordListManager,
-        #[case] expected_count: usize,
-        #[case] entries: Vec<WordEntry>,
-    ) {
-        let mut manager = word_list_manager;
+    fn test_add_entry(#[case] expected_count: usize, #[case] entries: Vec<WordEntry>) {
+        let mut manager = word_list_manager(vec![]);
 
         for entry in entries {
             match manager.add_entry(entry) {
@@ -322,11 +315,183 @@ mod tests {
             }
         }
 
-        for entry in manager.all_entries() {
-            let word = entry.word.to_string();
-            println!("{word}");
+        assert_eq!(manager.count(), expected_count);
+    }
+
+    /// This is the same exact as add entry, but with the add entries method.
+    #[rstest]
+    #[case::add_one_entry(1, vec![ word_entry("Word1", "2000-01-01", "Part", "Definition") ]) ]
+    #[case::add_multiple_entries(5, vec![ word_entry("Word1", "2000-01-01", "Part", "Definition"), word_entry("Word2", "2000-01-02", "Part", "Definition"), word_entry("Word3", "2000-01-03", "Part", "Definition"), word_entry("Word4", "2000-01-04", "Part", "Definition"), word_entry("Word5", "2000-01-05", "Part", "Definition") ])]
+    #[case::add_5_entries_with_same_date(1, vec![ word_entry("What", "2000-01-01", "Part", "Definition"), word_entry("Is", "2000-01-01", "Part", "Definition"), word_entry("This", "2000-01-01", "Part", "Definition"), word_entry("Doing", "2000-01-01", "Part", "Definition"), word_entry("Man", "2000-01-01", "Part", "Definition") ])]
+    #[case::add_duplicate_entries_then_new_entry(2, vec![ word_entry("Word1", "2000-01-01", "Part", "Definition"), word_entry("Word2", "2000-01-01", "Part", "Definition"), word_entry("Word3", "2000-01-01", "Part", "Definition"), word_entry("Word4", "2000-01-01", "Part", "Definition"), word_entry("Word5", "2000-01-04", "Part", "Definition") ])]
+    fn test_add_entries(#[case] expected_count: usize, #[case] entries: Vec<WordEntry>) {
+        let mut manager = word_list_manager(vec![]);
+
+        match manager.add_entries(entries.clone()) {
+            Ok(_size) => {
+                assert!(true);
+            }
+            Err(_error) => {
+                assert!(false);
+            }
         }
 
         assert_eq!(manager.count(), expected_count);
     }
+
+    #[rstest]
+    #[case::length_of_0(0, true)]
+    #[case::length_of_1(1, false)]
+    #[case::length_of_2(2, false)]
+    #[case::length_of_3(3, false)]
+    #[case::length_of_4(4, false)]
+    #[case::length_of_5(5, true)]
+    #[case::length_of_100000(100000, true)] // absurd length, expect nothing
+    fn test_get_random_by_length(#[case] length: usize, #[case] expect_none: bool) {
+        let word4: WordEntry = word_entry("4rrr", "", "", "");
+        let word3: WordEntry = word_entry("3ee", "", "", "");
+        let word2: WordEntry = word_entry("2u", "", "", "");
+        let word1: WordEntry = word_entry("1", "", "", "");
+        let manager = word_list_manager(vec![word1, word2, word3, word4]);
+
+        match manager.get_random_by_length(length) {
+            Some(word) => {
+                assert_eq!(word.length, length)
+            }
+            None => {
+                assert!(expect_none)
+            }
+        }
+    }
+
+    #[rstest]
+    #[case::no_entries("", "", true, vec![])]
+    #[case::normal_entries("2001-01-01", "2004-01-01", false, vec![ word_entry("", "2001-01-01", "", ""), word_entry("", "2004-01-01", "", "")])]
+    #[case::entry_between_start_and_end("2001-01-01", "2004-01-01", false, vec![ word_entry("", "2001-01-01", "", ""), word_entry("", "2002-01-01", "", "") , word_entry("", "2004-01-01", "", "")])]
+    #[case::one_entry("2001-01-01", "2001-01-01", false, vec![ word_entry("", "2001-01-01", "", "")])]
+    fn test_get_date_range(
+        #[case] expected_start: &str,
+        #[case] expected_end: &str,
+        #[case] expect_none: bool,
+        #[case] entries: Vec<WordEntry>,
+    ) {
+        let manager = word_list_manager(entries);
+
+        match manager.get_date_range() {
+            Some((start_date, end_date)) => {
+                assert_eq!(start_date, make_naive_date(expected_start));
+                assert_eq!(end_date, make_naive_date(expected_end));
+            }
+            None => assert!(expect_none),
+        }
+    }
+
+    #[rstest]
+    #[case::no_entries("2001-01-01", false, vec![])]
+    #[case::with_entries_but_wrong_date("2001-01-01", false, vec![ word_entry("", "2001-02-01", "", "")])]
+    #[case::with_entries_but_correct_date("2001-01-01", true, vec![ word_entry("", "2001-01-01", "", "")])]
+    fn test_has_date(
+        #[case] date: &str,
+        #[case] expect_contains_date: bool,
+        #[case] entries: Vec<WordEntry>,
+    ) {
+        let manager = word_list_manager(entries);
+
+        assert_eq!(
+            manager.has_date(make_naive_date(date)),
+            expect_contains_date
+        );
+    }
+
+    #[rstest]
+    #[case::no_entries(0, vec![])]
+    #[case::one_entries(1, vec![ word_entry("", "2001-02-01", "", "") ])]
+    #[case::four_entries(4, vec![ word_entry("", "2001-02-01", "", ""), word_entry("", "2001-02-01", "", ""), word_entry("", "2001-02-01", "", ""), word_entry("", "2001-02-01", "", "") ])]
+    fn test_count_entries(#[case] expected_count: usize, #[case] entries: Vec<WordEntry>) {
+        let manager = word_list_manager(entries);
+
+        assert_eq!(manager.count(), expected_count);
+    }
+
+    #[rstest]
+    #[case::file_exists(true, "wotd_words.json")]
+    #[case::file_doesnt_exist(false, "")]
+    fn test_file_exists(#[case] expected_exists: bool, #[case] path: &str) {
+        // wotd_words.json should always exist for program functionality so I used that to test that file exists
+        assert_eq!(WordListManager::file_exists(path), expected_exists);
+    }
+
+    /// This test fails, all_entries specifies it comes in sorted order, by length, then by date
+    #[rstest]
+    #[case::no_entries(vec![])]
+    #[case::in_order_entries(vec![ word_entry("a", "2001-01-01", "", ""), word_entry("ab", "2001-02-01", "", ""), word_entry("abc", "2001-03-01", "", "")])]
+    #[case::out_of_order_entries(vec![ word_entry("ab", "2001-02-01", "", ""), word_entry("a", "2001-03-01", "", ""), word_entry("abc", "2001-01-01", "", "")])]
+    #[case::same_length_out_of_order_date(vec![ word_entry("a", "2001-02-01", "", ""), word_entry("b", "2001-03-01", "", ""), word_entry("c", "2001-01-01", "", "")])]
+    #[case::same_date_out_of_order_length(vec![ word_entry("abc", "2001-01-01", "", ""), word_entry("c", "2001-01-01", "", ""), word_entry("ab", "2001-01-01", "", "")])]
+    fn test_all_entries(#[case] entries: Vec<WordEntry>) {
+        let manager = word_list_manager(entries);
+
+        let mut previous_date = make_naive_date("0000-00-00");
+        let mut previous_length: usize = 0;
+        // sorted by length, then by date
+        for entry in manager.all_entries() {
+            // Reset date of length changes
+            if entry.length > previous_length {
+                previous_date = entry.date_featured;
+            }
+
+            assert!(entry.length >= previous_length);
+            assert!(entry.date_featured >= previous_date);
+
+            previous_date = entry.date_featured;
+            previous_length = entry.length;
+        }
+    }
+
+    #[rstest]
+    #[case::no_entries(0, 0, vec![])]
+    #[case::one_entry(1, 1, vec![ word_entry("1", "", "", "")])]
+    #[case::one_entry_wrong_length(1, 0, vec![ word_entry("22", "", "", "")])]
+    #[case::multiple_entries_different_length(2, 2, vec![ word_entry("1", "", "", ""), word_entry("22", "", "", ""), word_entry("22", "", "", ""), word_entry("333", "", "", ""), word_entry("333", "", "", ""), word_entry("333", "", "", "")])]
+    fn test_entries_by_length(
+        #[case] target_length: usize,
+        #[case] expected_count: usize,
+        #[case] entries: Vec<WordEntry>,
+    ) {
+        let manager = word_list_manager(entries);
+
+        let words = manager.entries_by_length(target_length);
+
+        assert_eq!(words.len(), expected_count);
+    }
+
+    #[rstest]
+    #[case::no_entries(vec![])]
+    #[case::in_order_entries(vec![ word_entry("a", "2001-01-01", "", ""), word_entry("ab", "2001-02-01", "", ""), word_entry("abc", "2001-03-01", "", "")])]
+    #[case::out_of_order_entries(vec![ word_entry("ab", "2001-02-01", "", ""), word_entry("a", "2001-03-01", "", ""), word_entry("abc", "2001-01-01", "", "")])]
+    #[case::same_length_out_of_order_date(vec![ word_entry("a", "2001-02-01", "", ""), word_entry("b", "2001-03-01", "", ""), word_entry("c", "2001-01-01", "", "")])]
+    #[case::same_date_out_of_order_length(vec![ word_entry("abc", "2001-01-01", "", ""), word_entry("c", "2001-01-01", "", ""), word_entry("ab", "2001-01-01", "", "")])]
+    fn test_sort_entries(#[case] entries: Vec<WordEntry>) {
+        let mut manager = word_list_manager(entries);
+
+        let mut previous_date = make_naive_date("0000-00-00");
+        let mut previous_length: usize = 0;
+        // sorted by length, then by date
+        manager.sort_entries();
+        for entry in manager.all_entries() {
+            // Reset date of length changes
+            if entry.length > previous_length {
+                previous_date = entry.date_featured;
+            }
+
+            assert!(entry.length >= previous_length);
+            assert!(entry.date_featured >= previous_date);
+
+            previous_date = entry.date_featured;
+            previous_length = entry.length;
+        }
+    }
+
+
+    fn test_persist() {}
 }

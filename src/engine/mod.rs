@@ -1,5 +1,5 @@
 use crate::engine::game_error::GameError;
-use crate::word_list_manager::{WordEntry, WordListManager};
+use crate::word_list_manager::{WordEntry};
 
 use std::collections::{HashMap, HashSet};
 
@@ -157,12 +157,10 @@ impl Game {
     }
 
     /// Determine if word is present in the dictionary
-    /// Temporarily always returns true because the dictionary only uses 5 letter words
     ///
     /// * `word` - word to find in dictionary
     fn in_dictionary(&self, word: &str) -> bool {
-        // self.dictionary.get(word).is_some()
-        true
+        self.dictionary.get(word).is_some()
     }
 
     /// get character of answer from a specified index

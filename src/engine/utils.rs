@@ -1,21 +1,39 @@
-use crate::engine::words::dictionary_words;
 use rand::seq::SliceRandom;
 use std::collections::{HashMap, HashSet};
+use std::fs;
 
 use crate::word_list_manager::{WordEntry, WordListManager};
 
 const WORD_LIST_PATH: &str = "wotd_words.json";
+const EXTENDED_WORDS_PATH: &str = "extended_words.csv";
 
-/// Creates a dictionary from the words defined in words.rs
+/// Creates a dictionary by combining
+/// words from the Wiktionary WOTD JSON dataset
+/// and words from extended_words.csv (one lowercase word per line)
 pub fn dictionary() -> HashSet<String> {
     let mut dict = HashSet::new();
-    for word in dictionary_words() {
-        dict.insert(word);
+
+    // Load words from the JSON word list.
+    if let Ok(manager) = WordListManager::new(WORD_LIST_PATH) {
+        for entry in manager.all_entries() {
+            dict.insert(entry.word.clone());
+        }
     }
+
+    // Load extra words from the plaintext CSV file (one word per line).
+    if let Ok(raw) = fs::read_to_string(EXTENDED_WORDS_PATH) {
+        for line in raw.lines() {
+            let word = line.trim();
+            if !word.is_empty() {
+                dict.insert(word.to_string());
+            }
+        }
+    }
+
     dict
 }
 
-/// Get random WordEntry by length from dataset
+/// Get a random WordEntry by length from the JSON dataset.
 pub fn get_random_word_by_length(length: usize) -> WordEntry {
     let manager = WordListManager::new(WORD_LIST_PATH).expect("Failed to load word list");
 
@@ -31,14 +49,11 @@ pub fn get_random_word() -> String {
     list.choose(&mut rand::thread_rng()).unwrap().to_string()
 }
 
-/// Maps the letter in a word to the count of the letter found in the word
+/// Maps the letter in a word to the count of the letter found in the word.
 pub fn build_letter_counts(word: &str) -> HashMap<char, usize> {
     let mut counts = HashMap::new();
 
     for character in word.chars() {
-        // If character is a key of counts
-        // then increment its value count by one
-        // else insert character as a new key with an initial count of one
         match counts.get_mut(&character) {
             Some(count) => *count += 1,
             None => {

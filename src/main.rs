@@ -35,6 +35,14 @@ struct Args {
         help = "Change the display colors. Valid values are light and dark"
     )]
     theme: String,
+
+    #[clap(
+        short,
+        long,
+        default_value_t = 5,
+        help = "Change the display colors. Valid values are any integer greater than 0"
+    )]
+    word_length: usize,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -51,11 +59,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         _ => Theme::dark_theme(),
     };
 
+    let word_length = args.word_length;
+
     let mut app = App::new(AppOptions {
         theme: theme,
         game_config: GameOptions {
             answer: None,
             difficulty: difficulty,
+            word_length: word_length,
         },
     });
 
@@ -69,11 +80,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     loop {
         terminal.draw(|frame| {
-            let _r = ui::draw(frame, &mut app);
+            let _r = ui::draw(frame, &mut app, word_length); // The last variable in this line of code is how many letters the ui will draw.
         })?;
 
         match events.next()? {
-            AppEvent::Input(event) => app.on_key(event),
+            AppEvent::Input(event) => app.on_key(event, word_length),
             AppEvent::Tick => {}
         }
 

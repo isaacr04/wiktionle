@@ -32,7 +32,7 @@ use Disclaimer::*;
 use GuessResult::*;
 
 const ROWS: usize = 6;
-const COLUMNS: usize = 5;
+// const COLUMNS: usize = 5;
 const CELL_WIDTH: usize = 5;
 const CELL_HEIGHT: usize = 3;
 const PADDING: usize = 1;
@@ -41,12 +41,12 @@ const PADDING: usize = 1;
 ///
 /// * `frame` - frame that is the terminal the game is played in
 /// * `app` - the app of the game to represent to the terminal
-pub fn draw<B: Backend>(frame: &mut Frame<B>, app: &mut App) -> Result<(), crate::ui::Error> {
+pub fn draw<B: Backend>(frame: &mut Frame<B>, app: &mut App, columns: usize) -> Result<(), crate::ui::Error> {
     // a LOT of this code comes from a Minesweeper implementation in Rust, found at:
     // https://github.com/cpcloud/minesweep-rs/blob/main/src/ui.rs
     let terminal_rect = frame.size();
     let grid_width =
-        u16::try_from(CELL_WIDTH * COLUMNS + 2 * PADDING).map_err(Error::ConvertUsizeToU16)?;
+        u16::try_from(CELL_WIDTH * columns + 2 * PADDING).map_err(Error::ConvertUsizeToU16)?;
     let grid_height =
         u16::try_from(CELL_HEIGHT * ROWS + 2 * PADDING).map_err(Error::ConvertUsizeToU16)?;
 
@@ -59,7 +59,7 @@ pub fn draw<B: Backend>(frame: &mut Frame<B>, app: &mut App) -> Result<(), crate
     let col_constraints = std::iter::repeat(Constraint::Length(
         u16::try_from(CELL_WIDTH).map_err(Error::ConvertUsizeToU16)?,
     ))
-    .take(COLUMNS)
+    .take(columns)
     .collect::<Vec<_>>();
 
     let outer_rects = Layout::default()

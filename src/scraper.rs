@@ -487,12 +487,38 @@ mod tests {
     }
 
     #[rstest]
-    fn test_parse_year_months() {
-        assert!(false);
+    #[case::valid_year("2001-01", 2001, 1, false)]
+    #[case::valid_year_invalid_month0("1970-00", 0, 0, true)]
+    #[case::valid_year_invalid_month13("1970-13", 0, 0, true)]
+    #[case::invalid_year("Year2000-01", 0, 0, true)]
+    #[case::invalid_string("Test-String", 0, 0, true)]
+    fn test_parse_year_months(
+        #[case] date_string: &str,
+        #[case] expected_year: i32,
+        #[case] expected_month: u32,
+        #[case] expect_error: bool,
+    ) {
+        match parse_year_month(date_string) {
+            Ok((year, month)) => {
+                assert_eq!(year, expected_year);
+                assert_eq!(month, expected_month);
+            }
+            Err(_) => assert!(expect_error),
+        };
     }
 
     #[rstest]
-    fn test_parse_wotd_block() {
+    #[case::invalid_html(true, "html")]
+    #[case::valid_html(false, r#"<div class="mw-content-ltr mw-parser-output" lang="en" dir="ltr"><style data-mw-deduplicate="TemplateStyles:r87233645">.mw-parser-output .mf-wotd>.wotd-container{margin-top:-47px}.mw-parser-output .mf-fwotd>.wotd-container{margin-top:-36px}.mw-parser-output .wotd-container{background:var(--wikt-palette-lighterblue,#ebf4ff);border:3px solid var(--wikt-palette-dulllightblue,#aabbdd)}.mw-parser-output .wotd-header{border-bottom:1px solid var(--wikt-palette-grey,#9e9e9e)}</style><div class="mf-wotd" title="Word of the day"><span style="position:relative; left:-10px; top:-10px;"><span typeof="mw:File"><a href="/wiki/polymath#English" title="polymath"><img src="//upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Writing_star.svg/120px-Writing_star.svg.png" decoding="async" width="62" height="50" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Writing_star.svg/250px-Writing_star.svg.png 2x" data-file-width="580" data-file-height="470"></a></span></span><table class="wotd-container" style="width:100%; padding:10px;"><tbody><tr><td><div style="float:right;" class="plainlinks"><small class="editlink"><a class="external text" href="https://en.wiktionary.org/w/index.php?title=Wiktionary:Word_of_the_day/2008/March_1&amp;action=edit">edit</a></small><small class="editlink">&nbsp;· <a class="external text" href="https://en.wiktionary.org/w/index.php?title=Wiktionary:Word_of_the_day/2008/March_1&amp;action=purge">refresh</a>&nbsp;· <a class="mw-selflink selflink">view</a></small></div><div class="wotd-header" style="font-size:150%; padding-left:40px;">Word of the day<span style="font-size:0.875rem;"><br>for <span id="WOTD-rss-date">March 1</span></span></div></td></tr><tr><td><b><a href="/wiki/polymath#English" title="polymath"><span id="WOTD-rss-title">polymath</span></a></b> <i>n</i></td></tr><tr><td style="vertical-align:top;"><div style="float:right"><span class="mw-default-size" typeof="mw:File"><span><span class="mw-tmh-player audio mw-file-element" style="width:250px;"><audio id="mwe_player_0_placeholder" preload="none" data-mw-tmh="" class="" width="250" style="width:250px;" data-durationhint="2" data-mwtitle="En-us-polymath.ogg" data-mwprovider="wikimediacommons" playsinline="" disabled="disabled" tabindex="-1"></audio><a class="mw-tmh-play" href="/wiki/File:En-us-polymath.ogg" title="Play audio" role="button"><span class="mw-tmh-play-icon notheme"></span></a><span class="mw-tmh-duration mw-tmh-label"><span class="sr-only">Duration: 2 seconds.</span><span aria-hidden="true">0:02</span></span></span></span></span></div><div id="WOTD-rss-description"><ol><li>A person with extraordinarily broad and comprehensive knowledge</li></ol></div></td></tr><tr><td style="vertical-align:top; font-size:80%; text-align:center;"><a href="/wiki/Wiktionary:Word_of_the_day/2008/February_28" title="Wiktionary:Word of the day/2008/February 28">← yesterday</a> | <style data-mw-deduplicate="TemplateStyles:r89131476">.mw-parser-output .hlist dl,.mw-parser-output .hlist ol,.mw-parser-output .hlist ul{margin:0;padding:0}.mw-parser-output .hlist dd,.mw-parser-output .hlist dt,.mw-parser-output .hlist li{margin:0;display:inline}.mw-parser-output .hlist.inline,.mw-parser-output .hlist.inline dl,.mw-parser-output .hlist.inline ol,.mw-parser-output .hlist.inline ul,.mw-parser-output .hlist dl dl,.mw-parser-output .hlist dl ol,.mw-parser-output .hlist dl ul,.mw-parser-output .hlist ol dl,.mw-parser-output .hlist ol ol,.mw-parser-output .hlist ol ul,.mw-parser-output .hlist ul dl,.mw-parser-output .hlist ul ol,.mw-parser-output .hlist ul ul{display:inline}.mw-parser-output .hlist .mw-empty-li,.mw-parser-output .hlist .mw-empty-elt{display:none}.mw-parser-output .hlist dt:after{content:": "}.mw-parser-output .hlist dd:after,.mw-parser-output .hlist li:after{content:" · ";font-weight:bold}.mw-parser-output .hlist dd:last-child:after,.mw-parser-output .hlist dt:last-child:after,.mw-parser-output .hlist li:last-child:after{content:none}.mw-parser-output .hlist dd dd:first-child:before,.mw-parser-output .hlist dd dt:first-child:before,.mw-parser-output .hlist dd li:first-child:before,.mw-parser-output .hlist dt dd:first-child:before,.mw-parser-output .hlist dt dt:first-child:before,.mw-parser-output .hlist dt li:first-child:before,.mw-parser-output .hlist li dd:first-child:before,.mw-parser-output .hlist li dt:first-child:before,.mw-parser-output .hlist li li:first-child:before{content:" (";font-weight:normal}.mw-parser-output .hlist dd dd:last-child:after,.mw-parser-output .hlist dd dt:last-child:after,.mw-parser-output .hlist dd li:last-child:after,.mw-parser-output .hlist dt dd:last-child:after,.mw-parser-output .hlist dt dt:last-child:after,.mw-parser-output .hlist dt li:last-child:after,.mw-parser-output .hlist li dd:last-child:after,.mw-parser-output .hlist li dt:last-child:after,.mw-parser-output .hlist li li:last-child:after{content:")";font-weight:normal}.mw-parser-output .hlist ol{counter-reset:listitem}.mw-parser-output .hlist ol>li{counter-increment:listitem}.mw-parser-output .hlist ol>li:before{content:" "counter(listitem)"\a0 "}.mw-parser-output .hlist dd ol>li:first-child:before,.mw-parser-output .hlist dt ol>li:first-child:before,.mw-parser-output .hlist li ol>li:first-child:before{content:" ("counter(listitem)"\a0 "}.mw-parser-output .nowraplinks a{white-space:nowrap}</style><div class="hlist" style="display:inline-block;"><ul><li><a href="/wiki/Wiktionary:Word_of_the_day" title="Wiktionary:Word of the day">About Word of the Day</a></li><li><a href="/wiki/Wiktionary:Word_of_the_day/Nominations" title="Wiktionary:Word of the day/Nominations">Nominate a word</a></li><li><span class="plainlinks" title="Wiktionary:Feedback"><a class="external text" href="https://en.wiktionary.org/w/index.php?title=Wiktionary:Feedback&amp;action=edit&amp;section=new&amp;preload=Wiktionary:Feedback%2Fpreload&amp;editintro=Wiktionary:Feedback%2Fintro&amp;preloadtitle=Word%20of%20the%20day%3A%20%5B%5Bpolymath%5D%5D">Leave feedback</a></span></li></ul></div> | <a href="/wiki/Wiktionary:Word_of_the_day/2008/March_2" title="Wiktionary:Word of the day/2008/March 2">tomorrow&nbsp;→</a></td></tr></tbody></table></div></div>"#)]
+    fn test_parse_wotd_block(#[case] expect_fail: bool, #[case] html: &str) {
+        match parse_wotd_block(html, NaiveDate::default()) {
+            Ok(_) => assert!(!expect_fail),
+            Err(_) => assert!(expect_fail),
+        }
+    }
+
+    #[rstest]
+    fn test_month_archive() {
         assert!(false);
     }
 }

@@ -58,11 +58,7 @@ pub struct WordGuess {
 impl WordGuess {
     /// Convert the Guess from a Vector of Guess Letters to a String representation
     pub fn word(&self) -> String {
-        self.letters
-            .as_slice()
-            .iter()
-            .map(|gl| gl.letter)
-            .collect()
+        self.letters.as_slice().iter().map(|gl| gl.letter).collect()
     }
 
     /// Get all individual letters of the word

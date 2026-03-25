@@ -35,8 +35,7 @@ pub fn dictionary() -> HashSet<String> {
 
 /// Get a random WordEntry by length from the JSON dataset.
 pub fn get_random_word_by_length(length: usize) -> WordEntry {
-    let manager = WordListManager::new(WORD_LIST_PATH)
-        .expect("Failed to load word list");
+    let manager = WordListManager::new(WORD_LIST_PATH).expect("Failed to load word list");
 
     manager
         .get_random_by_length(length)
@@ -47,9 +46,7 @@ pub fn get_random_word_by_length(length: usize) -> WordEntry {
 pub fn get_random_word() -> String {
     let dict = dictionary();
     let list = Vec::from_iter(dict.iter());
-    list.choose(&mut rand::thread_rng())
-        .unwrap()
-        .to_string()
+    list.choose(&mut rand::thread_rng()).unwrap().to_string()
 }
 
 /// Maps the letter in a word to the count of the letter found in the word.

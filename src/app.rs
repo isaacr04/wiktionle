@@ -118,6 +118,7 @@ mod tests {
     use crossterm::event::KeyModifiers;
 
     use super::*;
+    use rstest::*;
 
     /// Setup function preparing a test app
     /// with set settings and no answer
@@ -156,7 +157,7 @@ mod tests {
         }
     }
 
-    #[test]
+    #[rstest]
     /// Test escape quitting game
     fn test_on_key_escape() {
         let mut app = setup_app(None);
@@ -164,7 +165,7 @@ mod tests {
         assert!(app.should_quit)
     }
 
-    #[test]
+    #[rstest]
     /// on_valid_word is simple, it clears input, and disclaimer
     fn test_on_valid_word() {
         let mut app = setup_app(None);
@@ -180,7 +181,7 @@ mod tests {
         assert!(app.disclaimer == None); // disclaimer is none
     }
 
-    #[test]
+    #[rstest]
     /// Test backspace functionality
     fn test_on_backspace() {
         let mut app = setup_app(None);
@@ -204,7 +205,7 @@ mod tests {
         assert_eq!(app.input, "");
     }
 
-    #[test]
+    #[rstest]
     /// Check that backspace does nothing when input is already empty
     fn test_on_backspace_no_input() {
         let mut app = setup_app(None);
@@ -215,7 +216,7 @@ mod tests {
         assert_eq!(app.input, "");
     }
 
-    #[test]
+    #[rstest]
     /// Letters can be entered into the app
     fn test_on_letter_entered() {
         let mut app = setup_app(None);
@@ -227,7 +228,7 @@ mod tests {
         assert_eq!(app.input, "abc")
     }
 
-    #[test]
+    #[rstest]
     fn test_on_invalid_letter_entered() {
         let mut app = setup_app(None);
 
@@ -238,7 +239,7 @@ mod tests {
         assert_eq!(app.input, "a")
     }
 
-    #[test]
+    #[rstest]
     /// On enter input is validated
     fn test_on_enter_press() {
         let mut app = setup_app(None);
@@ -249,7 +250,7 @@ mod tests {
         assert!(app.disclaimer == None); // disclaimer cleared
     }
 
-    #[test]
+    #[rstest]
     /// On enter input is validated
     fn test_on_enter_press_correct_answer() {
         let mut app = setup_app(Some("train".to_string()));
@@ -265,7 +266,7 @@ mod tests {
         assert!(app.disclaimer == Some(Disclaimer::GameWonMessage)); // game won
     }
 
-    #[test]
+    #[rstest]
     /// On enter input is validated
     fn test_on_enter_press_correct_answer_different_case() {
         let mut app = setup_app(Some("train".to_string()));
@@ -276,7 +277,7 @@ mod tests {
         assert!(app.disclaimer == Some(Disclaimer::GameWonMessage)); // game won
     }
 
-    #[test]
+    #[rstest]
     /// On enter input is validated
     fn test_on_enter_press_valid_word() {
         let mut app = setup_app(Some("plain".to_string()));
@@ -288,7 +289,7 @@ mod tests {
         assert_eq!(app.input, ""); // word cleared in preparation for next
     }
 
-    #[test]
+    #[rstest]
     fn test_on_enter_press_invalid_word() {
         let mut app = setup_app(Some("train".to_string()));
 
@@ -298,7 +299,7 @@ mod tests {
         assert!(app.disclaimer == None); // disclaimer shouldn't be anything
     }
 
-    #[test]
+    #[rstest]
     fn test_app_lose_game() {
         let mut app = setup_app(Some("input".to_string()));
 
@@ -334,7 +335,7 @@ mod tests {
         assert_eq!(app.game.game_status(), GameStatus::Lost)
     }
 
-    #[test]
+    #[rstest]
     /// test that valid words can be entered after invalid words
     fn test_app_enter_valid_word_after_clearing_input() {
         let mut app = setup_app(None);

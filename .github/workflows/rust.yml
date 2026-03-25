@@ -53,4 +53,4 @@ jobs:
     # - name: Run test and coverage
     #   run: cargo llvm-cov --fail-under-lines 80
     - name: Run test
-      run: cargo test --verbose --no-fail-fast
+      run: cargo test --no-fail-fast -- --format=terse

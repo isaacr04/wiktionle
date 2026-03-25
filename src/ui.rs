@@ -41,7 +41,11 @@ const PADDING: usize = 1;
 ///
 /// * `frame` - frame that is the terminal the game is played in
 /// * `app` - the app of the game to represent to the terminal
-pub fn draw<B: Backend>(frame: &mut Frame<B>, app: &mut App, columns: usize) -> Result<(), crate::ui::Error> {
+pub fn draw<B: Backend>(
+    frame: &mut Frame<B>,
+    app: &mut App,
+    columns: usize,
+) -> Result<(), crate::ui::Error> {
     // a LOT of this code comes from a Minesweeper implementation in Rust, found at:
     // https://github.com/cpcloud/minesweep-rs/blob/main/src/ui.rs
     let terminal_rect = frame.size();

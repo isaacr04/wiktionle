@@ -471,8 +471,19 @@ mod tests {
     }
 
     #[rstest]
-    fn test_month_in_range() {
-        assert!(false);
+    #[case::month_in_range(2001, 1, Option::Some((2000, 1)), Option::Some((2002, 1)), true)]
+    #[case::month_in_range_at_beginning(2000, 1, Option::Some((2000, 1)), Option::Some((2002, 1)), true)]
+    #[case::month_in_range_at_end(2002, 1, Option::Some((2000, 1)), Option::Some((2002, 1)), true)]
+    #[case::month_after_end(2002, 2, Option::Some((2000, 1)), Option::Some((2002, 1)), false)]
+    #[case::month_before_beginning(2000, 1, Option::Some((2000, 2)), Option::Some((2002, 1)), false)]
+    fn test_month_in_range(
+        #[case] year: i32,
+        #[case] month: u32,
+        #[case] start: Option<(i32, u32)>,
+        #[case] end: Option<(i32, u32)>,
+        #[case] in_range: bool,
+    ) {
+        assert_eq!(month_in_range(year, month, start, end), in_range);
     }
 
     #[rstest]

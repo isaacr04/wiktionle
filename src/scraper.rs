@@ -391,3 +391,60 @@ fn clean_definition_text(raw: &str) -> String {
 
     out.split_whitespace().collect::<Vec<_>>().join(" ")
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rstest::*;
+
+    #[rstest]
+    #[case::no_brackets("definition", "definition")]
+    #[case::brackets("[[[extra text]]]definition", "definition")]
+    #[case::bracket_not_closed("[extra text definition", "")]
+    #[case::too_many_end_brackets("[extra text]]]definition", "]]definition")]
+    fn test_clean_definition_text(#[case] raw: &str, #[case] expected: String) {
+        assert_eq!(clean_definition_text(raw), expected);
+    }
+
+    #[rstest]
+    #[case::january(MONTHS[0], Some(1))]
+    #[case::february(MONTHS[1], Some(2))]
+    #[case::march(MONTHS[2], Some(3))]
+    #[case::april(MONTHS[3], Some(4))]
+    #[case::may(MONTHS[4], Some(5))]
+    #[case::june(MONTHS[5], Some(6))]
+    #[case::july(MONTHS[6], Some(7))]
+    #[case::august(MONTHS[7], Some(8))]
+    #[case::september(MONTHS[8], Some(9))]
+    #[case::october(MONTHS[9], Some(10))]
+    #[case::november(MONTHS[10], Some(11))]
+    #[case::december(MONTHS[11], Some(12))]
+    fn test_month_name_to_number(#[case] month: &str, #[case] expected: Option<u32>) {
+        assert_eq!(month_name_to_number(month), expected)
+    }
+
+    #[rstest]
+    fn test_days_in_month() {
+        assert!(false);
+    }
+
+    #[rstest]
+    fn test_month_is_fully_cached() {
+        assert!(false);
+    }
+
+    #[rstest]
+    fn test_month_in_range() {
+        assert!(false);
+    }
+
+    #[rstest]
+    fn test_parse_year_months() {
+        assert!(false);
+    }
+
+    #[rstest]
+    fn test_parse_wotd_block() {
+        assert!(false);
+    }
+}

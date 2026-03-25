@@ -1,5 +1,5 @@
 use crate::engine::game_error::GameError;
-use crate::word_list_manager::{WordEntry};
+use crate::word_list_manager::WordEntry;
 
 use std::collections::{HashMap, HashSet};
 
@@ -396,8 +396,9 @@ impl Game {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rstest::*;
 
-    #[test]
+    #[rstest]
     fn test_add_guess() {
         let mut game = Game::new(GameOptions {
             answer: Some("slump".to_string()),
@@ -408,7 +409,7 @@ mod tests {
     }
 
     #[rustfmt::skip]
-    #[test]
+    #[rstest]
     fn test_a_guess_is_stored_correctly() {
         let mut game = Game::new(GameOptions { answer: Some("haste".to_string()), difficulty: GameDifficulty::Easy, word_length: 5 });
         game.guess("heart", 5);
@@ -426,7 +427,7 @@ mod tests {
     }
 
     #[rustfmt::skip]
-    #[test]
+    #[rstest]
     fn test_letters_are_marked_in_word_until_the_count_of_letters_is_met() {
         let mut game = Game::new(GameOptions { answer: Some("sleep".to_string()), difficulty: GameDifficulty::Easy, word_length: 5 });
         game.guess("spell", 5);
@@ -444,7 +445,7 @@ mod tests {
     }
 
     #[rustfmt::skip]
-    #[test]
+    #[rstest]
     fn test_counts_apply_to_the_in_right_place_characters_first() {
         let mut game = Game::new(GameOptions { answer: Some("ahead".to_string()), difficulty: GameDifficulty::Easy, word_length: 5 });
         game.guess("added", 5);
@@ -461,31 +462,47 @@ mod tests {
         assert_eq!(game.guesses[0], spell_guess)
     }
 
-    #[test]
+    #[rstest]
     fn test_answer_at_index() {
-        let game = Game::new(GameOptions { answer: Some("ahead".to_string()), difficulty: GameDifficulty::Easy, word_length: 5 });
+        let game = Game::new(GameOptions {
+            answer: Some("ahead".to_string()),
+            difficulty: GameDifficulty::Easy,
+            word_length: 5,
+        });
         assert_eq!(game.answer_char_at_index(4), 'd');
     }
 
-    #[test]
+    #[rstest]
     fn test_answer_at_index_out_of_bounds() {
-        let game = Game::new(GameOptions { answer: Some("ahead".to_string()), difficulty: GameDifficulty::Easy, word_length: 5 });
+        let game = Game::new(GameOptions {
+            answer: Some("ahead".to_string()),
+            difficulty: GameDifficulty::Easy,
+            word_length: 5,
+        });
         assert_eq!(game.answer_char_at_index(6), '\0');
     }
 
-    #[test]
+    #[rstest]
     fn test_matches_answer_at_index() {
-        let game = Game::new(GameOptions { answer: Some("ahead".to_string()), difficulty: GameDifficulty::Easy, word_length: 5 });
+        let game = Game::new(GameOptions {
+            answer: Some("ahead".to_string()),
+            difficulty: GameDifficulty::Easy,
+            word_length: 5,
+        });
         assert!(game.matches_answer_at_index(4, 'd'));
     }
 
-    #[test]
+    #[rstest]
     fn test_matches_answer_at_index_out_of_bounds() {
-        let game = Game::new(GameOptions { answer: Some("ahead".to_string()), difficulty: GameDifficulty::Easy, word_length: 5 });
+        let game = Game::new(GameOptions {
+            answer: Some("ahead".to_string()),
+            difficulty: GameDifficulty::Easy,
+            word_length: 5,
+        });
         assert!(game.matches_answer_at_index(6, '\0'));
     }
 
-    #[test]
+    #[rstest]
     fn test_cannot_add_duplicate_guess() {
         let mut game = Game::new(GameOptions {
             answer: Some("slump".to_string()),
@@ -496,7 +513,7 @@ mod tests {
         assert_eq!(duplicate_guess, GuessResult::DuplicateGuess);
     }
 
-    #[test]
+    #[rstest]
     fn test_a_correct_guess_wins_the_game() {
         let mut game = Game::new(GameOptions {
             answer: Some("slump".to_string()),
@@ -506,7 +523,7 @@ mod tests {
         assert_eq!(won_the_game, GameStatus::Won);
     }
 
-    #[test]
+    #[rstest]
     fn test_a_correct_guess_with_different_case_wins() {
         let mut game = Game::new(GameOptions {
             answer: Some("slump".to_string()),
@@ -516,7 +533,7 @@ mod tests {
         assert_eq!(won_the_game, GameStatus::Won);
     }
 
-    #[test]
+    #[rstest]
     fn test_a_guess_cannot_be_less_than_five_characters() {
         let mut game = Game::new(GameOptions {
             answer: Some("slump".to_string()),
@@ -526,7 +543,7 @@ mod tests {
         assert_eq!(char_count_wrong, GuessResult::IncorrectCharacterCount);
     }
 
-    #[test]
+    #[rstest]
     fn test_a_guess_cannot_be_more_than_five_characters() {
         let mut game = Game::new(GameOptions {
             answer: Some("slump".to_string()),
@@ -536,7 +553,7 @@ mod tests {
         assert_eq!(char_count_wrong, GuessResult::IncorrectCharacterCount);
     }
 
-    #[test]
+    #[rstest]
     fn test_the_game_is_lost_after_six_incorrect_guesses() {
         let mut game = Game::new(GameOptions {
             answer: Some("slump".to_string()),
@@ -551,7 +568,7 @@ mod tests {
         assert_eq!(lost_the_game, GameStatus::Lost);
     }
 
-    #[test]
+    #[rstest]
     fn test_cannot_add_guesses_after_the_game_is_won() {
         let mut game = Game::new(GameOptions {
             answer: Some("slump".to_string()),
@@ -564,7 +581,7 @@ mod tests {
         assert_eq!(game_already_over, GuessResult::GameIsAlreadyOver);
     }
 
-    #[test]
+    #[rstest]
     fn test_cannot_add_guesses_after_the_game_is_lost() {
         let mut game = Game::new(GameOptions {
             answer: Some("slump".to_string()),
@@ -582,7 +599,7 @@ mod tests {
         assert_eq!(game_already_over, GuessResult::GameIsAlreadyOver);
     }
 
-    #[test]
+    #[rstest]
     fn test_cannot_add_a_word_that_does_not_exist() {
         let mut game = Game::new(GameOptions {
             answer: Some("slump".to_string()),
@@ -593,7 +610,7 @@ mod tests {
         assert_eq!(invalid_word, GuessResult::NotInDictionary);
     }
 
-    #[test]
+    #[rstest]
     fn test_can_get_the_answer_after_the_game_is_lost() {
         let mut game = Game::new(GameOptions {
             answer: Some("slump".to_string()),
@@ -610,7 +627,7 @@ mod tests {
         assert_eq!(game.get_answer(), Ok("slump".to_string()));
     }
 
-    #[test]
+    #[rstest]
     fn test_hard_mode_requires_guessing_letters_that_have_been_found_in_place() {
         let mut game = Game::new(GameOptions {
             answer: Some("abbey".to_string()),
@@ -623,7 +640,7 @@ mod tests {
         assert_eq!(required_letter, GuessResult::LetterDoesNotMatch('e', 4));
     }
 
-    #[test]
+    #[rstest]
     fn test_hard_mode_requires_guessing_letters_that_have_been_found_in_the_word() {
         let mut game = Game::new(GameOptions {
             answer: Some("abbey".to_string()),
@@ -640,7 +657,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[rstest]
     fn test_hard_mode_can_include_guesses_with_old_and_new_letters() {
         let mut game = Game::new(GameOptions {
             answer: Some("slump".to_string()),
@@ -654,7 +671,7 @@ mod tests {
         assert_eq!(valid_word, GuessResult::Valid);
     }
 
-    #[test]
+    #[rstest]
     fn test_keeps_track_of_which_letters_matched() {
         let mut game = Game::new(GameOptions {
             answer: Some("slump".to_string()),
@@ -684,7 +701,7 @@ mod tests {
         assert_eq!(game.get_letter_match_state('m'), None);
     }
 
-    #[test]
+    #[rstest]
     fn test_letters_matches_are_not_overwritten_by_lesser_tiers() {
         let mut game = Game::new(GameOptions {
             answer: Some("laugh".to_string()),
@@ -717,7 +734,7 @@ mod tests {
         assert_eq!(game.get_letter_match_state('h'), None);
     }
 
-    #[test]
+    #[rstest]
     fn test_letters_matches_are_not_overwritten_by_subsequent_incorrect_guesses() {
         let mut game = Game::new(GameOptions {
             answer: Some("ahead".to_string()),
@@ -733,7 +750,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[rstest]
     fn test_row_states_are_tracked_at_the_start_of_the_game() {
         let game = Game::new(GameOptions {
             answer: Some("laugh".to_string()),
@@ -752,7 +769,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[rstest]
     fn test_row_states_are_tracked_in_the_middle_of_the_game() {
         let mut game = Game::new(GameOptions {
             answer: Some("laugh".to_string()),
@@ -773,7 +790,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[rstest]
     fn test_row_states_are_tracked_when_you_win_before_the_end() {
         let mut game = Game::new(GameOptions {
             answer: Some("laugh".to_string()),
@@ -795,7 +812,7 @@ mod tests {
         );
     }
 
-    #[test]
+    #[rstest]
     fn test_row_states_are_tracked_at_the_end_of_the_game() {
         let mut game = Game::new(GameOptions {
             answer: Some("laugh".to_string()),

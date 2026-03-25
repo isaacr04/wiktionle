@@ -68,6 +68,7 @@ pub fn build_letter_counts(word: &str) -> HashMap<char, usize> {
 #[cfg(test)]
 mod tests {
     use super::*; // import names of outer scope
+    use rstest::*;
 
     #[test]
     fn test_dictionary() {

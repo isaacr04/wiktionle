@@ -96,6 +96,7 @@ impl Events {
 mod tests {
 
     use super::*;
+    use rstest::*;
 
     fn setup_events() -> Events {
         // set tick rate to zero in testing we don't want to wait any time
@@ -103,7 +104,7 @@ mod tests {
         Events::new(tick_rate)
     }
 
-    #[test]
+    #[rstest]
     #[ignore = "breaks in workflow due to unavailable input reader"]
     /// Test functionality of next event
     fn test_next_event_no_input() {

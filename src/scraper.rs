@@ -394,7 +394,10 @@ fn clean_definition_text(raw: &str) -> String {
 
 #[cfg(test)]
 mod tests {
+    use std::ops::Add;
+
     use super::*;
+    use chrono::{Days, TimeDelta};
     use rstest::*;
 
     #[rstest]
@@ -424,13 +427,47 @@ mod tests {
     }
 
     #[rstest]
-    fn test_days_in_month() {
-        assert!(false);
+    #[case::january_2001(2001, 1, 31)]
+    #[case::february_2004(2004, 2, 29)]
+    #[case::february_2005(2005, 2, 28)]
+    #[case::december_2009(2009, 12, 31)]
+    fn test_days_in_month(#[case] year: i32, #[case] month: u32, #[case] expected: u32) {
+        assert_eq!(days_in_month(year, month), expected);
     }
 
     #[rstest]
     fn test_month_is_fully_cached() {
-        assert!(false);
+        let mut manager = WordListManager::new("").unwrap();
+        let mut date = NaiveDate::default();
+
+        let month = date.month();
+
+        // Before filling it will be false
+        assert!(!month_is_fully_cached(
+            &manager,
+            1970,
+            1,
+            Option::Some((1970, 1))
+        ));
+
+        // Fill month with days
+        while date.month() == month {
+            let _ = manager.add_entry(WordEntry {
+                word: "".to_string(),
+                length: 0,
+                date_featured: date,
+                part_of_speech: "".to_string(),
+                definition: "".to_string(),
+            });
+            date = date.checked_add_days(Days::new(1)).unwrap();
+        }
+
+        assert!(month_is_fully_cached(
+            &manager,
+            1970,
+            1,
+            Option::Some((1970, 1))
+        ));
     }
 
     #[rstest]

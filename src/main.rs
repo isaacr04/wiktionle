@@ -35,12 +35,19 @@ struct Args {
         help = "Change the display colors. Valid values are light and dark"
     )]
     theme: String,
+
+    #[clap(
+        short,
+        long,
+        default_value_t = 5,
+        help = "Change the display colors. Valid values are any integer greater than 0"
+    )]
+    word_length: usize,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     enable_raw_mode()?;
 
-    let word_length: usize = 6;
     let args = Args::parse();
     let difficulty = match args.difficulty.as_ref() {
         "hard" => GameDifficulty::Hard,
@@ -51,6 +58,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "light" => Theme::light_theme(),
         _ => Theme::dark_theme(),
     };
+
+    let word_length = args.word_length;
 
     let mut app = App::new(AppOptions {
         theme: theme,

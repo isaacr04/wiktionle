@@ -20,37 +20,51 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  check-duplicate:
-    # First thing if there are any duplicate actions skip them
-    # otherwise it runs twice on pull requests
-    runs-on: ubuntu-latest
-
-    # Track should skip status
-    outputs:
-      should_skip: ${{ steps.skip-check.outputs.should_skip }}
-
-    steps:
-    - id: skip-check
-      uses: fkirc/skip-duplicate-actions@v5.3.1
-      with:
-        concurrent_skipping: 'same_content'
-        do_not_skip: '["pull_request"]'
-
-
   build_and_test:
-    needs: check-duplicate
-    # if no duplicate actions are occuring then run tests and coverage
-    if: needs.check-duplicate.outputs.should_skip != 'true'
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
-    # - name: Setup Testing Tools
-    #   run: cargo install cargo-llvm-cov
+
+    - name: Install Rust
+      run: rustup update stable
+
+    - name: Install cargo-llvm-cov
+      uses: taiki-e/install-action@cargo-llvm-cov
 
     - name: Build
       run: cargo build --verbose
-    # - name: Run test and coverage
-    #   run: cargo llvm-cov --fail-under-lines 80
-    - name: Run test
-      run: cargo test --no-fail-fast -- --format=terse
+
+    - name: Run test and report coverage
+      run: | 
+        cargo llvm-cov --no-report --no-fail-fast
+        cargo llvm-cov report --ignore-filename-regex="events.rs|ui.rs|words.rs"
+    
+    # Attach coverage to the current pull request
+    - name: Attach Coverage To Pull Request
+      if: github.event_name == 'pull_request'
+      run: |
+        echo "## Coverage Report" > report.md
+        echo "\`\`\`" >> report.md
+        cargo llvm-cov report --ignore-filename-regex="events.rs|ui.rs|words.rs" >> report.md
+        echo "\`\`\`" >> report.md
+    
+    - name: Upload Coverage Report
+      if: github.event_name == 'pull_request'
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-artifact
+        path: |
+          report.md
+    
+    # Attach report to pull request
+    - name: Attach Coverage Report to Pull Request
+      if: github.event_name == 'pull_request'
+      uses: thollander/actions-comment-pull-request@v3.0.1
+      with:
+        file-path: report.md
+    
+    # Then clean up any generated files
+    - name: Cleanup Generated Report
+      if: github.event_name == 'pull_request'
+      run: rm report.md

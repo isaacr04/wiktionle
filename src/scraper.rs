@@ -144,8 +144,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
+    let today = Utc::now().date_naive();
+
     let to_process: Vec<(NaiveDate, String)> = entries_raw
         .into_iter()
+        // NEW: do not include future entries
+        .filter(|(date, _)| *date <= today)
+        // Existing behavior
         .filter(|(date, _)| !manager.has_date(*date))
         .collect();
 
@@ -397,7 +402,7 @@ mod tests {
     use std::ops::Add;
 
     use super::*;
-    use chrono::{Days, TimeDelta};
+    use chrono::{Days};
     use rstest::*;
 
     #[rstest]

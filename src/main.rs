@@ -7,7 +7,7 @@ mod ui;
 mod word_list_manager;
 
 use crate::app::{App, AppOptions};
-use crate::engine::{GameDifficulty, GameOptions};
+use crate::engine::{GameDifficulty, GameOptions, WordSelectionMode};
 use crate::events::{AppEvent, Events};
 use crate::theme::Theme;
 
@@ -43,6 +43,13 @@ struct Args {
         help = "Change the display colors. Valid values are any integer greater than 0"
     )]
     word_length: usize,
+
+    #[clap(
+        long,
+        default_value = "random",
+        help = "Word selection mode. Valid values are random and most-recent"
+    )]
+    word_selection: String,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -59,14 +66,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         _ => Theme::dark_theme(),
     };
 
+    let word_selection = match args.word_selection.as_ref() {
+        "most-recent" => WordSelectionMode::MostRecent,
+        _ => WordSelectionMode::RandomByLength,
+    };
+
     let word_length = args.word_length;
 
     let mut app = App::new(AppOptions {
-        theme: theme,
+        theme,
         game_config: GameOptions {
             answer: None,
-            difficulty: difficulty,
-            word_length: word_length,
+            difficulty,
+            word_length,
+            word_selection,
         },
     });
 
@@ -79,12 +92,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     terminal.clear()?;
 
     loop {
+        let current_word_length = app.game.word_length();
+
         terminal.draw(|frame| {
-            let _r = ui::draw(frame, &mut app, word_length); // The last variable in this line of code is how many letters the ui will draw.
+            let _r = ui::draw(frame, &mut app, current_word_length);
         })?;
 
         match events.next()? {
-            AppEvent::Input(event) => app.on_key(event, word_length),
+            AppEvent::Input(event) => app.on_key(event),
             AppEvent::Tick => {}
         }
 

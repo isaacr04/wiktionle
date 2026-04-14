@@ -38,10 +38,17 @@ pub enum GameDifficulty {
     Hard,
 }
 
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub enum WordSelectionMode {
+    RandomByLength,
+    MostRecent,
+}
+
 /// Primary Game structure, representing a game of wordle being played
 pub struct Game {
     guesses: Vec<WordGuess>,
     answer: WordEntry,
+    word_length: usize,
     difficulty: GameDifficulty,
     game_status: GameStatus,
     correct_positions: HashSet<usize>,
@@ -84,6 +91,7 @@ pub struct GameOptions {
     pub answer: Option<String>,
     pub difficulty: GameDifficulty,
     pub word_length: usize,
+    pub word_selection: WordSelectionMode,
 }
 
 impl Default for GameOptions {
@@ -93,6 +101,7 @@ impl Default for GameOptions {
             answer: None,
             difficulty: GameDifficulty::Easy,
             word_length: 5,
+            word_selection: WordSelectionMode::RandomByLength,
         }
     }
 }
@@ -103,7 +112,14 @@ impl Game {
     /// * `args` - defines the options used to configure the game when initially created
     pub fn new(args: GameOptions) -> Self {
         let answer = args.answer.map_or_else(
-            || utils::get_random_word_by_length(args.word_length),
+            || match args.word_selection {
+                WordSelectionMode::RandomByLength => {
+                    utils::get_random_word_by_length(args.word_length)
+                }
+                WordSelectionMode::MostRecent => {
+                    utils::get_most_recent_word()
+                }
+            },
             |a| {
                 WordEntry::new(
                     a,
@@ -114,9 +130,12 @@ impl Game {
             },
         );
 
+        let word_length = answer.length;
+
         Game {
             guesses: Vec::with_capacity(6),
             answer,
+            word_length,
             difficulty: args.difficulty,
             game_status: GameStatus::InProgress,
             correct_positions: HashSet::new(),
@@ -131,6 +150,9 @@ impl Game {
                 RowState::Empty,
             ],
         }
+    }
+    pub fn word_length(&self) -> usize {
+        self.word_length
     }
 
     /// Obtain the current status of the game, whether it is won, lost, or inprogress
@@ -233,12 +255,12 @@ impl Game {
     /// Returning game status after guess and result of guess.
     ///
     /// * `guess_input` - the guess made
-    pub fn guess(&mut self, guess_input: &str, word_length: usize) -> (GameStatus, GuessResult) {
+    pub fn guess(&mut self, guess_input: &str) -> (GameStatus, GuessResult) {
         if self.game_status == GameStatus::Won || self.game_status == GameStatus::Lost {
             return (self.game_status, GuessResult::GameIsAlreadyOver);
         }
 
-        if guess_input.len() != word_length {
+        if guess_input.len() != self.word_length {
             return (self.game_status, GuessResult::IncorrectCharacterCount);
         }
 
@@ -275,7 +297,7 @@ impl Game {
             }
         }
 
-        let guess = self.build_guess(guess_input, word_length);
+        let guess = self.build_guess(guess_input);
         self.recalculate_played_letter_registry(&guess);
 
         self.guesses.push(guess);
@@ -284,8 +306,6 @@ impl Game {
             self.game_status = GameStatus::Won;
         }
 
-        // we need to do this _after setting the game state to 'won', but before returning
-        // This way the board does not update with a duplicate row in the next 'current' row
         self.recalculate_row_states();
 
         if self.game_status == GameStatus::Won {
@@ -315,15 +335,10 @@ impl Game {
     /// Build a guess from the current guess input
     ///
     /// * `guess_input` - the guess being made
-    fn build_guess(&mut self, guess_input: &str, word_length: usize) -> WordGuess {
+    fn build_guess(&mut self, guess_input: &str) -> WordGuess {
         let mut discoverable_letters = utils::build_letter_counts(&self.answer.word);
-        let mut guess_letters: Vec<Option<GuessLetter>> = vec![None];
-        for _i in 1..word_length {
-            guess_letters.push(None);
-        }
+        let mut guess_letters: Vec<Option<GuessLetter>> = vec![None; self.word_length];
 
-        // Weird stuff. We walk the word twice; We go over the correct guesses first, so that we
-        // can subtract their letters from the count of available letters to colorize.
         for (idx, c) in guess_input.chars().enumerate() {
             if self.matches_answer_at_index(idx, c) {
                 guess_letters[idx] =
@@ -331,7 +346,6 @@ impl Game {
             }
         }
 
-        // Then we go over the letters that are not correct.
         for (idx, c) in guess_input.chars().enumerate() {
             if guess_letters[idx].is_none() {
                 guess_letters[idx] =
@@ -404,15 +418,15 @@ mod tests {
             answer: Some("slump".to_string()),
             ..Default::default()
         });
-        game.guess("pasta", 5);
+        game.guess("pasta");
         assert_eq!(game.guesses.len(), 1)
     }
 
     #[rustfmt::skip]
     #[rstest]
     fn test_a_guess_is_stored_correctly() {
-        let mut game = Game::new(GameOptions { answer: Some("haste".to_string()), difficulty: GameDifficulty::Easy, word_length: 5 });
-        game.guess("heart", 5);
+        let mut game = Game::new(GameOptions { answer: Some("haste".to_string()), difficulty: GameDifficulty::Easy, word_length: 5, word_selection: WordSelectionMode::RandomByLength });
+        game.guess("heart");
 
         let spell_guess = super::WordGuess {
             letters: vec![
@@ -429,8 +443,8 @@ mod tests {
     #[rustfmt::skip]
     #[rstest]
     fn test_letters_are_marked_in_word_until_the_count_of_letters_is_met() {
-        let mut game = Game::new(GameOptions { answer: Some("sleep".to_string()), difficulty: GameDifficulty::Easy, word_length: 5 });
-        game.guess("spell", 5);
+        let mut game = Game::new(GameOptions { answer: Some("sleep".to_string()), difficulty: GameDifficulty::Easy, word_length: 5, word_selection: WordSelectionMode::RandomByLength });
+        game.guess("spell");
 
         let spell_guess = super::WordGuess {
             letters: vec![
@@ -447,8 +461,8 @@ mod tests {
     #[rustfmt::skip]
     #[rstest]
     fn test_counts_apply_to_the_in_right_place_characters_first() {
-        let mut game = Game::new(GameOptions { answer: Some("ahead".to_string()), difficulty: GameDifficulty::Easy, word_length: 5 });
-        game.guess("added", 5);
+        let mut game = Game::new(GameOptions { answer: Some("ahead".to_string()), difficulty: GameDifficulty::Easy, word_length: 5, word_selection: WordSelectionMode::RandomByLength });
+        game.guess("added");
 
         let spell_guess = super::WordGuess {
             letters: vec![
@@ -468,6 +482,7 @@ mod tests {
             answer: Some("ahead".to_string()),
             difficulty: GameDifficulty::Easy,
             word_length: 5,
+            word_selection: WordSelectionMode::RandomByLength,
         });
         assert_eq!(game.answer_char_at_index(4), 'd');
     }
@@ -478,6 +493,7 @@ mod tests {
             answer: Some("ahead".to_string()),
             difficulty: GameDifficulty::Easy,
             word_length: 5,
+            word_selection: WordSelectionMode::RandomByLength,
         });
         assert_eq!(game.answer_char_at_index(6), '\0');
     }
@@ -488,6 +504,7 @@ mod tests {
             answer: Some("ahead".to_string()),
             difficulty: GameDifficulty::Easy,
             word_length: 5,
+            word_selection: WordSelectionMode::RandomByLength,
         });
         assert!(game.matches_answer_at_index(4, 'd'));
     }
@@ -498,6 +515,7 @@ mod tests {
             answer: Some("ahead".to_string()),
             difficulty: GameDifficulty::Easy,
             word_length: 5,
+            word_selection: WordSelectionMode::RandomByLength,
         });
         assert!(game.matches_answer_at_index(6, '\0'));
     }
@@ -508,8 +526,8 @@ mod tests {
             answer: Some("slump".to_string()),
             ..Default::default()
         });
-        game.guess("pasta", 5);
-        let (_, duplicate_guess) = game.guess("pasta", 5);
+        game.guess("pasta");
+        let (_, duplicate_guess) = game.guess("pasta");
         assert_eq!(duplicate_guess, GuessResult::DuplicateGuess);
     }
 
@@ -519,7 +537,7 @@ mod tests {
             answer: Some("slump".to_string()),
             ..Default::default()
         });
-        let (won_the_game, _) = game.guess("slump", 5);
+        let (won_the_game, _) = game.guess("slump");
         assert_eq!(won_the_game, GameStatus::Won);
     }
 
@@ -529,7 +547,7 @@ mod tests {
             answer: Some("slump".to_string()),
             ..Default::default()
         });
-        let (won_the_game, _) = game.guess("Slump", 5);
+        let (won_the_game, _) = game.guess("Slump");
         assert_eq!(won_the_game, GameStatus::Won);
     }
 
@@ -539,7 +557,7 @@ mod tests {
             answer: Some("slump".to_string()),
             ..Default::default()
         });
-        let (_, char_count_wrong) = game.guess("slp", 5);
+        let (_, char_count_wrong) = game.guess("slp");
         assert_eq!(char_count_wrong, GuessResult::IncorrectCharacterCount);
     }
 
@@ -549,7 +567,7 @@ mod tests {
             answer: Some("slump".to_string()),
             ..Default::default()
         });
-        let (_, char_count_wrong) = game.guess("slumffffp", 5);
+        let (_, char_count_wrong) = game.guess("slumffffp");
         assert_eq!(char_count_wrong, GuessResult::IncorrectCharacterCount);
     }
 
@@ -559,12 +577,12 @@ mod tests {
             answer: Some("slump".to_string()),
             ..Default::default()
         });
-        game.guess("admit", 5);
-        game.guess("adorn", 5);
-        game.guess("adult", 5);
-        game.guess("affix", 5);
-        game.guess("afire", 5);
-        let (lost_the_game, _) = game.guess("after", 5);
+        game.guess("admit");
+        game.guess("adorn");
+        game.guess("adult");
+        game.guess("affix");
+        game.guess("afire");
+        let (lost_the_game, _) = game.guess("after");
         assert_eq!(lost_the_game, GameStatus::Lost);
     }
 
@@ -574,8 +592,8 @@ mod tests {
             answer: Some("slump".to_string()),
             ..Default::default()
         });
-        game.guess("slump", 5);
-        let (won_the_game, game_already_over) = game.guess("adept", 5);
+        game.guess("slump");
+        let (won_the_game, game_already_over) = game.guess("adept");
 
         assert_eq!(won_the_game, GameStatus::Won);
         assert_eq!(game_already_over, GuessResult::GameIsAlreadyOver);
@@ -587,14 +605,14 @@ mod tests {
             answer: Some("slump".to_string()),
             ..Default::default()
         });
-        game.guess("admit", 5);
-        game.guess("adorn", 5);
-        game.guess("adult", 5);
-        game.guess("affix", 5);
-        game.guess("afire", 5);
-        game.guess("aging", 5);
+        game.guess("admit");
+        game.guess("adorn");
+        game.guess("adult");
+        game.guess("affix");
+        game.guess("afire");
+        game.guess("aging");
 
-        let (lost_the_game, game_already_over) = game.guess("agony", 5);
+        let (lost_the_game, game_already_over) = game.guess("agony");
         assert_eq!(lost_the_game, GameStatus::Lost);
         assert_eq!(game_already_over, GuessResult::GameIsAlreadyOver);
     }
@@ -605,7 +623,7 @@ mod tests {
             answer: Some("slump".to_string()),
             ..Default::default()
         });
-        let (game_continues, invalid_word) = game.guess("djkle", 5);
+        let (game_continues, invalid_word) = game.guess("djkle");
         assert_eq!(game_continues, GameStatus::InProgress);
         assert_eq!(invalid_word, GuessResult::NotInDictionary);
     }
@@ -616,14 +634,14 @@ mod tests {
             answer: Some("slump".to_string()),
             ..Default::default()
         });
-        game.guess("admit", 5);
-        game.guess("adorn", 5);
-        game.guess("adult", 5);
-        game.guess("affix", 5);
-        game.guess("afire", 5);
+        game.guess("admit");
+        game.guess("adorn");
+        game.guess("adult");
+        game.guess("affix");
+        game.guess("afire");
 
         assert_eq!(game.get_answer(), Err(GameError::GameNotLostError));
-        game.guess("aging", 5);
+        game.guess("aging");
         assert_eq!(game.get_answer(), Ok("slump".to_string()));
     }
 
@@ -633,10 +651,11 @@ mod tests {
             answer: Some("abbey".to_string()),
             difficulty: GameDifficulty::Hard,
             word_length: 5,
+            word_selection: WordSelectionMode::RandomByLength,
         });
-        game.guess("sleep", 5);
+        game.guess("sleep");
 
-        let (_, required_letter) = game.guess("hours", 5);
+        let (_, required_letter) = game.guess("hours");
         assert_eq!(required_letter, GuessResult::LetterDoesNotMatch('e', 4));
     }
 
@@ -646,11 +665,12 @@ mod tests {
             answer: Some("abbey".to_string()),
             difficulty: GameDifficulty::Hard,
             word_length: 5,
+            word_selection: WordSelectionMode::RandomByLength,
         });
-        let (_, valid_word) = game.guess("slept", 5);
+        let (_, valid_word) = game.guess("slept");
         assert_eq!(valid_word, GuessResult::Valid);
 
-        let (_, required_letter) = game.guess("grift", 5);
+        let (_, required_letter) = game.guess("grift");
         assert_eq!(
             required_letter,
             GuessResult::DoesNotIncludeRequiredLetter('e')
@@ -663,10 +683,11 @@ mod tests {
             answer: Some("slump".to_string()),
             difficulty: GameDifficulty::Hard,
             word_length: 5,
+            word_selection: WordSelectionMode::RandomByLength,
         });
-        game.guess("sleep", 5);
+        game.guess("sleep");
 
-        let (game_continues, valid_word) = game.guess("sloop", 5);
+        let (game_continues, valid_word) = game.guess("sloop");
         assert_eq!(game_continues, GameStatus::InProgress);
         assert_eq!(valid_word, GuessResult::Valid);
     }
@@ -677,7 +698,7 @@ mod tests {
             answer: Some("slump".to_string()),
             ..Default::default()
         });
-        game.guess("slept", 5);
+        game.guess("slept");
 
         assert_eq!(
             game.get_letter_match_state('s'),
@@ -707,7 +728,7 @@ mod tests {
             answer: Some("laugh".to_string()),
             ..Default::default()
         });
-        game.guess("larva", 5);
+        game.guess("larva");
 
         assert_eq!(
             game.get_letter_match_state('l'),
@@ -740,10 +761,10 @@ mod tests {
             answer: Some("ahead".to_string()),
             ..Default::default()
         });
-        game.guess("lease", 5);
+        game.guess("lease");
         assert_eq!(game.get_letter_match_state('e'), Some(HitAccuracy::InWord));
 
-        game.guess("preen", 5);
+        game.guess("preen");
         assert_eq!(
             game.get_letter_match_state('e'),
             Some(HitAccuracy::InRightPlace)
@@ -775,7 +796,7 @@ mod tests {
             answer: Some("laugh".to_string()),
             ..Default::default()
         });
-        game.guess("admit", 5);
+        game.guess("admit");
 
         assert_eq!(
             game.row_states(),
@@ -796,8 +817,8 @@ mod tests {
             answer: Some("laugh".to_string()),
             ..Default::default()
         });
-        game.guess("admit", 5);
-        game.guess("laugh", 5);
+        game.guess("admit");
+        game.guess("laugh");
 
         assert_eq!(
             game.row_states(),
@@ -818,12 +839,12 @@ mod tests {
             answer: Some("laugh".to_string()),
             ..Default::default()
         });
-        game.guess("admit", 5);
-        game.guess("adorn", 5);
-        game.guess("adult", 5);
-        game.guess("affix", 5);
-        game.guess("afire", 5);
-        game.guess("aging", 5);
+        game.guess("admit");
+        game.guess("adorn");
+        game.guess("adult");
+        game.guess("affix");
+        game.guess("afire");
+        game.guess("aging");
         assert_eq!(
             game.row_states(),
             vec![

@@ -49,6 +49,12 @@ pub fn draw<B: Backend>(
     // a LOT of this code comes from a Minesweeper implementation in Rust, found at:
     // https://github.com/cpcloud/minesweep-rs/blob/main/src/ui.rs
     let terminal_rect = frame.size();
+
+    let bg_block = Block::default()
+        .border_style(Style::default().fg(app.theme.background_color))
+        .style(Style::default().bg(app.theme.background_color));
+    frame.render_widget(bg_block, terminal_rect);
+
     let grid_width =
         u16::try_from(CELL_WIDTH * columns + 2 * PADDING).map_err(Error::ConvertUsizeToU16)?;
     let grid_height =
@@ -113,7 +119,8 @@ pub fn draw<B: Backend>(
 
     let game_board = Block::default()
         .borders(Borders::ALL)
-        .border_type(BorderType::Rounded);
+        .border_type(BorderType::Rounded)
+        .style(Style::default().bg(app.theme.background_color));
 
     let game_board_section = center_content_vertically[1];
     frame.render_widget(game_board, game_board_section);

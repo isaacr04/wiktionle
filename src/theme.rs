@@ -19,6 +19,7 @@ pub struct Theme {
     pub row_border_thickness: BorderType,
     pub guessed_row_border_thickness: BorderType,
     pub welcome_message_color: Color,
+    pub background_color: Color,
 }
 
 impl Default for Theme {
@@ -46,6 +47,7 @@ impl Theme {
             keyboard_not_in_word_color: Color::Gray,
             row_border_thickness: BorderType::Plain,
             guessed_row_border_thickness: BorderType::Thick,
+            background_color: Color::White,
         }
     }
 
@@ -58,6 +60,7 @@ impl Theme {
             welcome_message_color: Color::White,
             keyboard_not_guessed_color: Color::White,
             keyboard_not_in_word_color: Color::Gray,
+            background_color: Color::Black,
             ..Theme::light_theme()
         }
     }

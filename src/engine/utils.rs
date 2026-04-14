@@ -42,6 +42,15 @@ pub fn get_random_word_by_length(length: usize) -> WordEntry {
         .expect("No word found for requested length")
 }
 
+/// Get the most recent WordEntry from the JSON dataset.
+pub fn get_most_recent_word() -> WordEntry {
+    let manager = WordListManager::new(WORD_LIST_PATH).expect("Failed to load word list");
+
+    manager
+        .get_most_recent()
+        .expect("Could not get most recent word")
+}
+
 /// Original version (keeping until tests can be updated)
 pub fn get_random_word() -> String {
     let dict = dictionary();

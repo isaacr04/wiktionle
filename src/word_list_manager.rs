@@ -172,6 +172,17 @@ impl WordListManager {
         pool.choose(&mut rand::thread_rng()).map(|e| (*e).clone())
     }
 
+    /// Return the most recent [`WordEntry`] according to `date_featured`.
+    ///
+    /// Returns `None` when no entries exist.
+    pub fn get_most_recent(&self) -> Option<WordEntry> {
+        self
+            .entries
+            .iter()
+            .max_by_key(|e| e.date_featured)
+            .cloned()
+    }
+
     /// Return the `(earliest_date, latest_date)` of all records on file.
     ///
     /// Returns `None` when the list is empty.

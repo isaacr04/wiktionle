@@ -53,7 +53,11 @@ impl App {
             }
             KeyCode::Backspace => self.on_backspace(),
             KeyCode::Enter => self.on_enter_press(),
-            KeyCode::Char(letter) => self.on_letter_entered(letter),
+            KeyCode::Char(letter) => {
+                if letter.is_alphabetic() {
+                    self.on_letter_entered(letter.to_lowercase().next().unwrap())
+                }
+            },
             _ => (),
         };
     }

@@ -5,9 +5,11 @@ use crossterm::event::{KeyCode, KeyEvent};
 #[derive(PartialEq)]
 pub enum Disclaimer {
     MoveFeedback(GuessResult),
-    GameWonMessage,
+    GameWonMessage(String, String),
     GameOverMessage(String),
     WelcomeMessage,
+    ClassHint(String),
+    DefinitonHint(String),
 }
 
 pub struct App {
@@ -52,7 +54,7 @@ impl App {
                 self.should_quit = true;
             }
             KeyCode::Backspace => self.on_backspace(),
-            KeyCode::Enter => self.on_enter_press(),
+            KeyCode::Enter => self.on_enter_press(self.game.guesses().len()),
             KeyCode::Char(letter) => {
                 if letter.is_alphabetic() {
                     self.on_letter_entered(letter.to_lowercase().next().unwrap())
@@ -85,7 +87,7 @@ impl App {
     /// * display disclaimer for invalid input, or other messages
     /// * checks if input was correct or wrong and display correct disclaimer
     /// * checks if game was lost
-    pub fn on_enter_press(&mut self) {
+    pub fn on_enter_press(&mut self, guesses: usize) {
         if self.disclaimer == Some(Disclaimer::WelcomeMessage) {
             self.disclaimer = None;
         }
@@ -101,11 +103,17 @@ impl App {
                 }
             }
             (GameStatus::Won, _) => {
-                self.disclaimer = Some(Disclaimer::GameWonMessage);
+                self.disclaimer = Some(Disclaimer::GameWonMessage(self.game.get_definition(), self.game.get_date()));
             }
             (_, word_res) => match word_res {
                 GuessResult::Valid => {
                     let _ = &self.on_valid_word();
+                    if guesses >= 3 {
+                        self.disclaimer = Some(Disclaimer::DefinitonHint(self.game.get_definition()))
+                    }
+                    else if guesses >= 1 {
+                        self.disclaimer = Some(Disclaimer::ClassHint(self.game.get_part_of_speech()))
+                    }
                 }
                 result => {
                     self.disclaimer = Some(Disclaimer::MoveFeedback(result));
@@ -118,6 +126,7 @@ impl App {
 #[cfg(test)]
 mod tests {
     use crate::engine::{GameDifficulty, WordSelectionMode};
+    use chrono::NaiveDate;
     use crossterm::event::KeyModifiers;
 
     use super::*;
@@ -245,7 +254,9 @@ mod tests {
         app.on_key(make_key_event(KeyCode::Char('n')));
 
         app.on_key(make_key_event(KeyCode::Enter));
-        assert!(app.disclaimer == Some(Disclaimer::GameWonMessage));
+        let test = String::new();
+        let test_date = NaiveDate::from_ymd_opt(1970, 1, 1).unwrap().to_string();
+        assert!(app.disclaimer == Some(Disclaimer::GameWonMessage(test, test_date)));
     }
 
     #[rstest]
@@ -255,7 +266,9 @@ mod tests {
         app_enter_letters(&mut app, "TRain");
 
         app.on_key(make_key_event(KeyCode::Enter));
-        assert!(app.disclaimer == Some(Disclaimer::GameWonMessage));
+        let test = String::new();
+        let test_date = NaiveDate::from_ymd_opt(1970, 1, 1).unwrap().to_string();
+        assert!(app.disclaimer == Some(Disclaimer::GameWonMessage(test, test_date)));
     }
 
     #[rstest]

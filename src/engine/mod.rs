@@ -169,6 +169,21 @@ impl Game {
         }
     }
 
+    // Obtain the part of speech of the answer
+    pub fn get_part_of_speech(&self) -> String {
+        self.answer.part_of_speech.clone()
+    }
+
+    // Obtain the definition of the answer
+    pub fn get_definition(&self) -> String {
+        self.answer.definition.clone()
+    }
+
+    // Obtain the date of the answer as a printable string
+    pub fn get_date(&self) -> String {
+        self.answer.date_featured.to_string()
+    }
+
     /// Obtain all guesses currently made
     pub fn guesses(&self) -> &[WordGuess] {
         self.guesses.as_slice()

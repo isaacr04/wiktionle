@@ -307,7 +307,9 @@ fn formatted_cell_text(text: String) -> String {
 /// * `chunk` - the rectangle where the message is displayed
 pub fn draw_header<B: Backend>(frame: &mut Frame<B>, app: &mut App, chunk: Rect) {
     let text = match &app.disclaimer {
-        Some(GameWonMessage) => String::from("Game is over! You win! Press any key to exit."),
+        Some(GameWonMessage(definition, date)) => {
+            format!("'{definition}.' {date}. Press any key to exit.")
+        },
         Some(GameOverMessage(answer)) => {
             format!("Game over! The answer was '{answer}'. Press any key to exit.")
         }
@@ -330,6 +332,12 @@ pub fn draw_header<B: Backend>(frame: &mut Frame<B>, app: &mut App, chunk: Rect)
             GameIsAlreadyOver => String::from("The game is already over!"),
             Valid => String::from(""),
         },
+        Some(ClassHint(class)) => {
+            format!("The word's part of speech is: {class}")
+        },
+        Some(DefinitonHint(definition)) => {
+            format!("'{definition}'")
+        },
         Some(WelcomeMessage) => {
             String::from("Welcome to Wordlet. You have six tries to guess the answer. Good luck!")
         }
@@ -337,7 +345,7 @@ pub fn draw_header<B: Backend>(frame: &mut Frame<B>, app: &mut App, chunk: Rect)
     };
 
     let header_text_color = match &app.disclaimer {
-        Some(GameWonMessage) => app.theme.header_text_success_color,
+        Some(GameWonMessage(_definition, _date)) => app.theme.header_text_success_color,
         Some(WelcomeMessage) => app.theme.welcome_message_color,
         _ => app.theme.header_text_error_color,
     };

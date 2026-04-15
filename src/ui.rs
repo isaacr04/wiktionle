@@ -15,6 +15,7 @@
 use crate::app::{App, Disclaimer};
 use crate::engine::{GuessResult, HitAccuracy, RowState};
 use crate::theme::BlockTheme;
+use std::time::{SystemTime, UNIX_EPOCH};
 use tui::{
     Frame,
     backend::Backend,
@@ -63,14 +64,14 @@ pub fn draw<B: Backend>(
     let row_constraints = std::iter::repeat(Constraint::Length(
         u16::try_from(CELL_HEIGHT).map_err(Error::ConvertUsizeToU16)?,
     ))
-    .take(ROWS)
-    .collect::<Vec<_>>();
+        .take(ROWS)
+        .collect::<Vec<_>>();
 
     let col_constraints = std::iter::repeat(Constraint::Length(
         u16::try_from(CELL_WIDTH).map_err(Error::ConvertUsizeToU16)?,
     ))
-    .take(columns)
-    .collect::<Vec<_>>();
+        .take(columns)
+        .collect::<Vec<_>>();
 
     let outer_rects = Layout::default()
         .direction(Direction::Vertical)
@@ -300,6 +301,39 @@ fn formatted_cell_text(text: String) -> String {
         .join("\n")
 }
 
+
+fn animate_scrolltext(text: &str) -> String {
+    const MAX_VISIBLE_CHARS: usize = 80;
+    const MS_PER_CHAR: u128 = 250;
+
+    let chars: Vec<char> = text.chars().collect();
+
+    if chars.len() <= MAX_VISIBLE_CHARS {
+        return text.to_string();
+    }
+
+    // Add spacer so the loop has a visible gap before restarting.
+    let spacer = "     ";
+    let padded: Vec<char> = format!("{}{}", text, spacer).chars().collect();
+    let total_len = padded.len();
+
+    let now_ms = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_millis();
+
+    let offset = ((now_ms / MS_PER_CHAR) as usize) % total_len;
+
+    let mut visible = String::with_capacity(MAX_VISIBLE_CHARS);
+
+    for i in 0..MAX_VISIBLE_CHARS {
+        let idx = (offset + i) % total_len;
+        visible.push(padded[idx]);
+    }
+
+    visible
+}
+
 /// Draw header (disclaimer/message) to terminal frame
 ///
 /// * `frame` - terminal window displayed to user
@@ -322,7 +356,7 @@ pub fn draw_header<B: Backend>(frame: &mut Frame<B>, app: &mut App, chunk: Rect)
                     1 => "1st".to_string(),
                     2 => "2nd".to_string(),
                     3 => "3rd".to_string(),
-                    _ => format!("{ch}th"),
+                    _ => format!("{idx}th"),
                 };
                 format!("The {number} letter must be '{ch}'")
             }
@@ -339,10 +373,12 @@ pub fn draw_header<B: Backend>(frame: &mut Frame<B>, app: &mut App, chunk: Rect)
             format!("'{definition}'")
         },
         Some(WelcomeMessage) => {
-            String::from("Welcome to Wordlet. You have six tries to guess the answer. Good luck!")
+            String::from("Welcome to Wiktionle. You have six tries to guess the answer. Good luck!")
         }
         None => String::from(""),
     };
+
+    let display_text = animate_scrolltext(&text);
 
     let header_text_color = match &app.disclaimer {
         Some(GameWonMessage(_definition, _date)) => app.theme.header_text_success_color,
@@ -350,7 +386,7 @@ pub fn draw_header<B: Backend>(frame: &mut Frame<B>, app: &mut App, chunk: Rect)
         _ => app.theme.header_text_error_color,
     };
 
-    let header_text = Paragraph::new(text)
+    let header_text = Paragraph::new(display_text)
         .wrap(Wrap { trim: true })
         .style(Style::default().fg(header_text_color))
         .alignment(Alignment::Center)
@@ -364,6 +400,7 @@ pub fn draw_header<B: Backend>(frame: &mut Frame<B>, app: &mut App, chunk: Rect)
 
     frame.render_widget(header_text, chunk);
 }
+
 
 /// Draw the letters available for the guess in the bottom rectangle
 ///

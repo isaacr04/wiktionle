@@ -6,9 +6,38 @@ A educational Wordle clone that uses Wiktionary's historical "Word of the Day" e
 
 ## Installation
 
+### Requirements
++ [Rust](https://rust-lang.org/tools/install/)
+
+### Steps
+1. Clone Wiktionle Repository 
+2. Open terminal inside of repository directory.
+3. To run Wiktionle, execute the following command:
+```bash
+cargo run --bin wiktionle
 ```
-cargo install --git https://github.com/isaacr04/wiktionle
+4. To update wordlist for new words, execute the following command:
 ```
+cargo run --bin scraper
+```
+
+### How to Run tests
+Run all tests using the command:
+```
+cargo test --no-fail-fast
+```
+
+To report test coverage run the following commands:
+```
+cargo install cargo-llvm-cov
+cargo llvm-cov --no-fail-fast --fail-under-lines 80 --no-report -- --format=terse 
+cargo llvm-cov report --ignore-filename-regex="words.rs|main.rs|events.rs|ui.rs"
+```
+
+#### Reasons for excluding files from coverage report
++ **words.rs**: it is a file simply filled with thousands of lines of hardcoded strings which are no longer needed by this program as we no longer hard code the word list.
++ **main.rs**, **events.rs**, **ui.rs**: These files handle handle input and graphical output from the terminal which we do not have availability to test to through github actions or automatically running our tests.
+
 
 ## Features
 

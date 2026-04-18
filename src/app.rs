@@ -303,22 +303,22 @@ mod tests {
 
         app_enter_letters(&mut app, "plain");
         app.on_key(make_key_event(KeyCode::Enter));
-        assert!(app.disclaimer == None);
+        assert!(app.disclaimer.is_some()); // Disclaimer shall be given after first attempt
         assert_eq!(app.input, "");
 
         app_enter_letters(&mut app, "faint");
         app.on_key(make_key_event(KeyCode::Enter));
-        assert!(app.disclaimer == None);
+        assert!(app.disclaimer.is_some());
         assert_eq!(app.input, "");
 
         app_enter_letters(&mut app, "claim");
         app.on_key(make_key_event(KeyCode::Enter));
-        assert!(app.disclaimer == None);
+        assert!(app.disclaimer.is_some()); 
         assert_eq!(app.input, "");
 
         app_enter_letters(&mut app, "sword");
         app.on_key(make_key_event(KeyCode::Enter));
-        assert!(app.disclaimer == None);
+        assert!(app.disclaimer.is_some());
         assert_eq!(app.input, "");
 
         app_enter_letters(&mut app, "flail");

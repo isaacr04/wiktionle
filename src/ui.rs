@@ -394,7 +394,7 @@ pub fn draw_header<B: Backend>(frame: &mut Frame<B>, app: &mut App, chunk: Rect)
             Block::default()
                 .borders(Borders::ALL)
                 .style(Style::default().fg(app.theme.border_color))
-                .title("Wordlet")
+                .title("Wiktionle")
                 .border_type(BorderType::Plain),
         );
 

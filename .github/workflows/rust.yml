@@ -45,12 +45,32 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    # - name: Setup Testing Tools
-    #   run: cargo install cargo-llvm-cov
+    - name: Setup Testing Tools
+      run: cargo install cargo-llvm-cov
 
     - name: Build
       run: cargo build --verbose
-    # - name: Run test and coverage
-    #   run: cargo llvm-cov --fail-under-lines 80
-    - name: Run test
-      run: cargo test --no-fail-fast -- --format=terse
+    - name: Run test and coverage
+      run: cargo llvm-cov --no-fail-fast --fail-under-lines 80 --no-report -- --format=terse 
+    - name: Report Coverage
+      run: |
+        echo "# Coverage Report" > coverage_report.md
+        echo \`\`\` >> coverage_report.md
+        cargo llvm-cov report --ignore-filename-regex="words.rs|main.rs|events.rs|ui.rs" | tee -a coverage_report.md
+        echo \`\`\` >> coverage_report.md
+      
+    - name: Upload Coverage Report
+      if: github.event_name == 'pull_request'
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-coverage-artiface
+        path: coverage_report.md
+      
+    - name: Attach Test Coverage Report To Pull Request
+      if: github.event_name == 'pull_request'
+      uses: thollander/actions-comment-pull-request@v3.0.1
+      with:
+        file-path: coverage_report.md
+
+    - name: Cleanup Generated Report
+      run: rm coverage_report.md

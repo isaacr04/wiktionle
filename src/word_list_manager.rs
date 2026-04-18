@@ -284,10 +284,10 @@ mod tests {
     }
 
     #[rstest]
-    #[case::no_file_available("asdoaisfjaois.asfjas", false)] // No valid path is given, no words should be loaded
-    #[case::file_given("wotd_words.json", true)] // Words are given, list manager will be populated
-    #[case::invalid_file_given("Cargo.lock", false)] // read invalid file, no words will be read
-    fn test_create_word_list(#[case] path: &str, #[case] expect_filled: bool) {
+    #[case::no_file_available("asdoaisfjaois.asfjas", false, false)] // No valid path is given, no words should be loaded
+    #[case::file_given("wotd_words.json", true, false)] // Words are given, list manager will be populated
+    #[case::invalid_file_given("Cargo.lock", false, true)] // read invalid file, error will occur
+    fn test_create_word_list(#[case] path: &str, #[case] expect_filled: bool, #[case] expected_error: bool) {
         match WordListManager::new(path) {
             Ok(manager) => match expect_filled {
                 true => {
@@ -298,8 +298,7 @@ mod tests {
                 }
             },
             Err(_error) => {
-                assert!(false);
-                panic!("Unable to generate WordListManager for test");
+                assert!(expected_error);
             }
         }
     }
@@ -436,8 +435,11 @@ mod tests {
     #[rstest]
     #[case::no_entries(vec![])]
     #[case::in_order_entries(vec![ word_entry("a", "2001-01-01", "", ""), word_entry("ab", "2001-02-01", "", ""), word_entry("abc", "2001-03-01", "", "")])]
+    #[ignore="Case was made when method documentation specified thet all_entries provides words in sorted order, it is handled by another method."]
     #[case::out_of_order_entries(vec![ word_entry("ab", "2001-02-01", "", ""), word_entry("a", "2001-03-01", "", ""), word_entry("abc", "2001-01-01", "", "")])]
+    #[ignore="Case was made when method documentation specified thet all_entries provides words in sorted order, it is handled by another method."]
     #[case::same_length_out_of_order_date(vec![ word_entry("a", "2001-02-01", "", ""), word_entry("b", "2001-03-01", "", ""), word_entry("c", "2001-01-01", "", "")])]
+    #[ignore="Case was made when method documentation specified thet all_entries provides words in sorted order, it is handled by another method."]
     #[case::same_date_out_of_order_length(vec![ word_entry("abc", "2001-01-01", "", ""), word_entry("c", "2001-01-01", "", ""), word_entry("ab", "2001-01-01", "", "")])]
     fn test_all_entries(#[case] entries: Vec<WordEntry>) {
         let manager = word_list_manager(entries);

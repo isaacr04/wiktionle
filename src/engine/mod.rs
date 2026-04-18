@@ -537,7 +537,6 @@ mod tests {
     }
 
     #[rstest]
-    #[ignore="The app handles input validation not the engine"]
     fn test_cannot_add_duplicate_guess() {
         let mut game = Game::new(GameOptions {
             answer: Some("slump".to_string()),

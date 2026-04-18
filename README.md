@@ -17,18 +17,18 @@ A educational Wordle clone that uses Wiktionary's historical "Word of the Day" e
 cargo run --bin wiktionle
 ```
 4. To update wordlist for new words, execute the following command:
-```bash
+```
 cargo run --bin scraper
 ```
 
 ### How to Run tests
 Run all tests using the command:
-```bash
+```
 cargo test --no-fail-fast
 ```
 
 To report test coverage run the following commands:
-```bash
+```
 cargo install cargo-llvm-cov
 cargo llvm-cov --no-fail-fast --fail-under-lines 80 --no-report -- --format=terse 
 cargo llvm-cov report --ignore-filename-regex="words.rs|main.rs|events.rs|ui.rs"

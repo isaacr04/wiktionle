@@ -56,7 +56,7 @@ jobs:
       run: |
         echo "# Coverage Report" > coverage_report.md
         echo \`\`\` >> coverage_report.md
-        cargo llvm-cov report --ignore-filename-regex="words.rs|main.rs|events.rs|ui.rs" | tee -a
+        cargo llvm-cov report --ignore-filename-regex="words.rs|main.rs|events.rs|ui.rs" | tee -a coverage_report.md
         echo \`\`\` >> coverage_report.md
       
     - name: Upload Coverage Report

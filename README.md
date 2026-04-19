@@ -22,7 +22,7 @@ cargo run --bin scraper
 ```
 
 ### Configuration
-Additional options may be passed to `cargo run --bin wikitionle` to customize your playing experience using the following format:
+Additional options may be passed to customize your experience using the following format:
 ```
 cargo run --bin wiktionle -- [OPTIONS]
 ```

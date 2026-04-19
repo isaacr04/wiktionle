@@ -22,7 +22,7 @@ cargo run --bin scraper
 ```
 
 ### Configuration
-Additional options may be passed to `cargo run --bin wikitionle` to customize your playing experience using the following format
+Additional options may be passed to `cargo run --bin wikitionle` to customize your playing experience using the following format:
 ```
 cargo run --bin wiktionle -- [OPTIONS]
 ```
@@ -37,14 +37,14 @@ The following options can be applied to Wiktionle to customize your experience.
 
    --word-length <WORD_LENGTH>         WORD_LENGTH: numeric value
 
-   --word-selection <WORD_SELECTION>   WORD_SELECTION: most-recent, random-by-length,
+   --word-selection <WORD_SELECTION>   WORD_SELECTION: most-recent, random-by-length
 ```
 
 ```
 EXAMPLE
 Starting the wiktionle with a light them and a word length of 3.
 
-   $ cargo run --bin wiktionle -- --theme light --word-length 3
+   cargo run --bin wiktionle -- --theme light --word-length 3
 ```
 
 ### How to Run tests

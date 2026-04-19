@@ -12,13 +12,39 @@ A educational Wordle clone that uses Wiktionary's historical "Word of the Day" e
 ### Steps
 1. Clone Wiktionle Repository 
 2. Open terminal inside of repository directory.
-3. To run Wiktionle, execute the following command:
-```bash
+3. Run Wiktionle with the following command:
+```
 cargo run --bin wiktionle
 ```
-4. To update wordlist for new words, execute the following command:
+4. Update wordlist with the following command:
 ```
 cargo run --bin scraper
+```
+
+### Configuration
+Additional options may be passed to customize your experience using the following format:
+```
+cargo run --bin wiktionle -- [OPTIONS]
+```
+
+```
+OPTIONS
+The following options can be applied to Wiktionle to customize your experience.
+
+   --theme <THEME>                     THEME: dark, light
+
+   --difficulty <DIFFICULTY>           DIFFICULTY: easy, hard
+
+   --word-length <WORD_LENGTH>         WORD_LENGTH: numeric value
+
+   --word-selection <WORD_SELECTION>   WORD_SELECTION: most-recent, random-by-length
+```
+
+```
+EXAMPLE
+Starting the wiktionle with a light them and a word length of 3.
+
+   cargo run --bin wiktionle -- --theme light --word-length 3
 ```
 
 ### How to Run tests

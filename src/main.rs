@@ -18,7 +18,7 @@ use std::time::Duration;
 use tui::{Terminal, backend::CrosstermBackend};
 
 #[derive(Parser, Debug)]
-#[clap(about = "Wordlet is a command line Wordle clone.", version, author)]
+#[clap(about = "Wiktionle is a command line Wordle clone that uses Wiktionary's Word of the Day archive.", version, author)]
 struct Args {
     #[clap(
         short,
@@ -40,7 +40,7 @@ struct Args {
         short,
         long,
         default_value_t = 5,
-        help = "Change the display colors. Valid values are any integer greater than 0"
+        help = "Change the required length of random secret word. Valid values are any integer greater than 0"
     )]
     word_length: usize,
 

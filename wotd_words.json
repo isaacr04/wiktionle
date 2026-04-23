@@ -2114,6 +2114,13 @@
     "definition": "(transitive) To gradually cause (something frozen, such as earth, ice, or snow) to melt or soften by raising the temperature. To gradually cause (someone or something that is very cold) to warm up. (figurative) To cause (something inactive) to become active; also, to cause (something unfeeling) to have feelings. To cause (someone or their feelings that are reserved or unfriendly) to become friendly or gentle. (archaic, rare) To cause (something rigid) to become limp."
   },
   {
+    "word": "whet",
+    "length": 4,
+    "date_featured": "2026-04-16",
+    "part_of_speech": "v",
+    "definition": "(transitive) To sharpen (something, such as a knife or sword) by rubbing on an object, especially a whetstone; to hone. Of an animal such as a boar: to sharpen (its horns, teeth, tusks, etc.) by rubbing on a stone, etc., in preparation for an attack. (figurative) To make more keen or to stimulate (someone's appetite, interest, etc.); to hone, to sharpen. (obsolete) To encourage (someone) to do something; to incite, to urge. (obsolete) To inculcate or teach (habits, information, etc.). (obsolete, rare) Of a bird: to preen (its feathers)."
+  },
+  {
     "word": "brume",
     "length": 5,
     "date_featured": "2006-01-18",
@@ -10577,6 +10584,13 @@
     "definition": "Of a person or animal, or their behaviour: calm and composed (often in a dignified manner), and avoiding or unaffected by activity or excitement."
   },
   {
+    "word": "pennon",
+    "length": 6,
+    "date_featured": "2026-04-17",
+    "part_of_speech": "n",
+    "definition": "(chiefly historical) A long, narrow flag or streamer, often swallowtailed or triangular, usually hung at the top of a helmet or lance, originally the ensign of a knight under the rank of knight banneret, and later of a lancer regiment."
+  },
+  {
     "word": "burgage",
     "length": 7,
     "date_featured": "2006-01-17",
@@ -16140,6 +16154,13 @@
     "date_featured": "2026-03-22",
     "part_of_speech": "n",
     "definition": "A device used since ancient times in the Middle East to raise water from a well or other low point, consisting of a pivoted rod with a bucket on one end and a counterweight on the other."
+  },
+  {
+    "word": "asunder",
+    "length": 7,
+    "date_featured": "2026-04-18",
+    "part_of_speech": "adv",
+    "definition": "Of two or more people or things: Apart or separate from each other. Moving apart from each other."
   },
   {
     "word": "sybarite",
@@ -22302,6 +22323,13 @@
     "definition": "(also figurative) To become a friend of (someone), to make friends with (someone)."
   },
   {
+    "word": "cromlech",
+    "length": 8,
+    "date_featured": "2026-04-19",
+    "part_of_speech": "n",
+    "definition": "Synonym of stone circle (“a prehistoric monument consisting of standing stones arranged in a circle”), especially one located in Brittany, France."
+  },
+  {
     "word": "alpenglow",
     "length": 9,
     "date_featured": "2006-01-12",
@@ -27874,6 +27902,13 @@
     "definition": "(UK, dialectal) The bilberry or whortleberry (Vaccinium myrtillus)."
   },
   {
+    "word": "tang ping",
+    "length": 9,
+    "date_featured": "2026-04-20",
+    "part_of_speech": "n",
+    "definition": "(China, neologism) A lifestyle and social protest movement in China beginning in April 2021, which is a rejection of societal pressures to overwork."
+  },
+  {
     "word": "vade mecum",
     "length": 10,
     "date_featured": "2006-01-16",
@@ -30007,6 +30042,13 @@
     "date_featured": "2016-01-10",
     "part_of_speech": "n",
     "definition": "Something that constrains; a restriction."
+  },
+  {
+    "word": "psychopomp",
+    "length": 10,
+    "date_featured": "2016-01-23",
+    "part_of_speech": "n",
+    "definition": "(religion) A spirit, deity, person, etc., who guides the souls of the dead to the afterlife."
   },
   {
     "word": "obsidional",
@@ -38773,6 +38815,27 @@
     "definition": "(humorous) A supposed language in which groundhogs and humans can communicate with each other."
   },
   {
+    "word": "contrapposto",
+    "length": 12,
+    "date_featured": "2026-04-15",
+    "part_of_speech": "n",
+    "definition": "(art, especially sculpture, uncountable) The position of a human figure whose hips and legs are twisted away from the direction of the head and shoulders; (countable) an instance of this."
+  },
+  {
+    "word": "chaos theory",
+    "length": 12,
+    "date_featured": "2026-04-21",
+    "part_of_speech": "n",
+    "definition": "(mathematics, sciences, uncountable) The study of chaos or disorder in systems, specifically iterative non-linear systems in which arbitrarily small variations in initial conditions become magnified over time, and where within apparent randomness there are underlying patterns; (countable) one of such theories."
+  },
+  {
+    "word": "silvopasture",
+    "length": 12,
+    "date_featured": "2026-04-22",
+    "part_of_speech": "n",
+    "definition": "(countable) A forested or wooded area where domesticated animals are allowed to graze."
+  },
+  {
     "word": "concatenation",
     "length": 13,
     "date_featured": "2006-01-14",
@@ -44700,6 +44763,13 @@
     "date_featured": "2025-09-17",
     "part_of_speech": "v",
     "definition": "(intransitive, chiefly US, criminal law, humorous, hyperbolic, idiomatic) Of a grand jury: to charge a person with a crime, despite a perceived lack of evidence."
+  },
+  {
+    "word": "forward compatibility",
+    "length": 21,
+    "date_featured": "2026-04-23",
+    "part_of_speech": "n",
+    "definition": "(computer hardware, software) The capability of an electronic device, a piece of software, etc., to interoperate with anticipated future systems."
   },
   {
     "word": "thin-film interference",

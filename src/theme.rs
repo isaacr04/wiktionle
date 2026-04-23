@@ -60,6 +60,7 @@ impl Theme {
             welcome_message_color: Color::White,
             keyboard_not_guessed_color: Color::White,
             keyboard_not_in_word_color: Color::Gray,
+            guess_not_in_word_color: Color::Gray,
             background_color: Color::Black,
             ..Theme::light_theme()
         }
